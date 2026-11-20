@@ -4,7 +4,6 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Database](https://img.shields.io/badge/Vector%20DB-ChromaDB-orange.svg)](https://www.trychroma.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-100%25%20Passed-brightgreen.svg)](test_suite.py)
 
 > **"Your Rights, Clarified. Verified Law, Simplified."**  
 > An autonomous, multi-jurisdictional AI legal intelligence and plain-language advisory platform grounded in authentic statutory gazettes—featuring complete coverage of India's 2024 criminal law transition (**Bharatiya Nyaya Sanhita**, **BNSS**, and **BSA**) alongside US, UK, and EU statutory frameworks with zero speculative hallucinations.
@@ -39,16 +38,6 @@
    * All API credentials externalized in `.env` (strictly excluded by `.gitignore`).
    * **PBKDF2-HMAC-SHA256** cryptographic password hashing (100,000 iterations with 16-byte salts).
    * Cross-platform HTTP standard compliance with automated SSL fallback for cloud and enterprise environments.
-
----
-
-## 🧪 Verification & Automated Testing
-
-To run the complete 9-module automated test suite:
-```bash
-python test_suite.py
-```
-Expected output: **🎉 ALL TESTS PASSED SUCCESSFULLY! (100% Green)**
 
 ---
 
