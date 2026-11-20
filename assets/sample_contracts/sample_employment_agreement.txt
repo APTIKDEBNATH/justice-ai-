@@ -1,0 +1,26 @@
+STANDARD EMPLOYMENT AGREEMENT & RESTRICTIVE COVENANTS
+
+This Employment Agreement ("Agreement") is entered into as of January 15, 2026, by and between Apex Global Solutions Inc. ("Employer") and Employee ("Employee").
+
+1. POSITION AND DUTIES
+Employee agrees to serve as Lead Software Architect and shall perform all duties assigned by Employer.
+
+2. AT-WILL EMPLOYMENT & TERMINATION
+Employment is at-will. Employer may terminate this Agreement immediately without cause and without prior written notice at Employer's sole discretion. Employee must provide at least ninety (90) calendar days prior written notice before resigning. Failure to provide such notice shall result in forfeiture of all accrued unpaid wages and bonuses as liquidated damages.
+
+3. UNRESTRICTED RESTRICTIVE COVENANT / NON-COMPETE
+Employee agrees that during the term of employment and for a period of three (3) years following termination of employment for any reason whatsoever, Employee shall not, anywhere in the world, directly or indirectly, engage in, consult for, advise, or be employed by any enterprise that competes with Employer in the technology or software sector.
+
+4. ASSIGNMENT OF ALL INVENTIONS & MORAL RIGHTS
+Employee hereby assigns to Employer all right, title, and interest worldwide in perpetuity in and to any and all inventions, code, concepts, writings, and discoveries conceived, reduced to practice, or developed by Employee, whether created during working hours or personal hours, whether on Employer equipment or personal equipment, and whether or not related to Employer's business. Employee irrevocably waives all moral rights under any statutory law.
+
+5. UNLIMITED INDEMNIFICATION
+Employee agrees to defend, indemnify, and hold harmless Employer, its directors, and affiliates against any and all claims, damages, liabilities, losses, and legal costs arising directly or indirectly from Employee's performance of services, errors, or alleged breach of this Agreement, with no limitation or financial cap.
+
+6. GOVERNING LAW AND EXCLUSIVE ARBITRATION
+This Agreement shall be governed exclusively by the laws of the State of Delaware. Any dispute arising under this Agreement shall be resolved through binding private arbitration before a single arbitrator selected solely by Employer. Employee hereby waives any right to a trial by jury or to participate in any class action lawsuit.
+
+7. UNILATERAL AMENDMENT
+Employer reserves the right to modify or amend the terms of this Agreement and employee compensation policies at any time upon posting notice on the company intranet.
+
+IN WITNESS WHEREOF, the parties hereto have executed this Agreement.

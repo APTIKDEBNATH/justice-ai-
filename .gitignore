@@ -1,0 +1,51 @@
+# ==============================================================================
+# Justice AI - Git Ignore Policy (Strict Secret Isolation)
+# ==============================================================================
+
+# Secrets, Environment Variables & API Keys (NEVER COMMIT)
+.env
+*.env
+*.key
+*.pem
+secrets/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Local Databases, Vector Stores & Logs (Isolated per environment)
+data/*.db
+data/chroma_db/
+temp_payload.json
+temp_*.html
+temp_*.pdf
+test_*.pdf
+*.log
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

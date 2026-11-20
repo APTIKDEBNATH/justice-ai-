@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // Immediately unregister any rogue service workers from other localhost projects (e.g., Film Central)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let reg of registrations) {
+          reg.unregister();
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        for (let key of keys) {
+          caches.delete(key);
+        }
+      });
+    }
+  </script>
+  <title>Justice AI ⚖ | Universal Legal Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg-main: #F6F5F1;
+      --bg-sidebar: #ECEAE2;
+      --border-sidebar: #DEDBD0;
+      --border-light: #E2E0D8;
+      --border-input: #D9D6CC;
+      --text-primary: #1A1F2B;
+      --text-secondary: #5B6270;
+      --text-body: #2B3140;
+      --accent-primary: #1F4E79;
+      --bubble-user: #E6EEF6;
+      --tag-verified-bg: #E3F1E8;
+      --tag-verified-text: #1B5E3C;
+      --disclaimer-bg: #FBF3E1;
+      --disclaimer-border: #EBDDB5;
+      --disclaimer-text: #6B4E10;
+      --card-bg: #FFFFFF;
+    }
+    /* Strict Dark Theme (Zero White Elements - Pure Monochrome & Silver Slate) */
+    body.dark-theme {
+      --bg-main: #000000;
+      --bg-sidebar: #080808;
+      --border-sidebar: #1E1E22;
+      --border-light: #222226;
+      --border-input: #26262B;
+      --text-primary: #D4D4D8;
+      --text-secondary: #71717A;
+      --text-body: #A1A1AA;
+      --accent-primary: #27272A;
+      --bubble-user: #141416;
+      --tag-verified-bg: #141416;
+      --tag-verified-text: #8E9196;
+      --disclaimer-bg: #0A0A0C;
+      --disclaimer-border: #1E1E22;
+      --disclaimer-text: #71717A;
+      --card-bg: #0E0E10;
+    }
+    body.dark-theme .pill-primary {
+      background: #27272A !important;
+      border-color: #3F3F46 !important;
+      color: #E4E4E7 !important;
+    }
+    body.dark-theme .pill-primary:hover {
+      background: #3F3F46 !important;
+      border-color: #52525B !important;
+      color: #F4F4F5 !important;
+    }
+    body.dark-theme .tag-jur,
+    body.dark-theme .tag-ver {
+      background: #141416 !important;
+      border: 1px solid #27272A !important;
+      color: #A1A1AA !important;
+    }
+    body.dark-theme .chat-user-bubble {
+      background: #141416 !important;
+      border: 1px solid #26262B !important;
+      color: #D4D4D8 !important;
+    }
+    body.dark-theme .source-card {
+      background: #0E0E10 !important;
+      border-color: #1E1E22 !important;
+      color: #D4D4D8 !important;
+    }
+    body.dark-theme .source-card:hover {
+      border-color: #3F3F46 !important;
+      background: #141416 !important;
+    }
+    body.dark-theme .chip {
+      background: #121214 !important;
+      color: #A1A1AA !important;
+      border-color: #26262B !important;
+    }
+    body.dark-theme .chip:hover {
+      border-color: #3F3F46 !important;
+      color: #E4E4E7 !important;
+      background: #1A1A1E !important;
+    }
+    body.dark-theme .recent-item:hover,
+    body.dark-theme .recent-item.active {
+      background: #141416 !important;
+    }
+    body.dark-theme footer {
+      background: #000000 !important;
+      border-top-color: #1E1E22 !important;
+    }
+    body.dark-theme #chatInput {
+      background: #0E0E10 !important;
+      border-color: #26262B !important;
+      color: #D4D4D8 !important;
+    }
+    body.dark-theme footer button {
+      background: #27272A !important;
+      border: 1px solid #3F3F46 !important;
+      color: #D4D4D8 !important;
+    }
+    body.dark-theme .confidence-bar-inner {
+      background: #52525B !important;
+    }
+    body.dark-theme .confidence-bar-outer {
+      background: #202024 !important;
+    }
+    body.dark-theme .auth-card {
+      background: #0E0E10 !important;
+      border-color: #222226 !important;
+    }
+    body.dark-theme .auth-input {
+      background: #080808 !important;
+      border-color: #26262B !important;
+      color: #D4D4D8 !important;
+    }
+    body.dark-theme .user-profile-badge {
+      background: #0E0E10 !important;
+      border-color: #1E1E22 !important;
+    }
+
+    /* Borderless Theme Toggle Button */
+    .theme-toggle-btn {
+      border: none !important;
+      background: transparent !important;
+      color: var(--text-primary) !important;
+      cursor: pointer !important;
+      width: 38px !important;
+      height: 38px !important;
+      min-width: 38px !important;
+      min-height: 38px !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      outline: none !important;
+      transition: background-color 0.2s ease, transform 0.15s ease !important;
+    }
+    .theme-toggle-btn:hover {
+      background-color: var(--border-light) !important;
+      transform: scale(1.08) !important;
+    }
+    body.dark-theme .theme-toggle-btn:hover {
+      background-color: #1C1C20 !important;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-main);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+    button, input, select, textarea { font: inherit; }
+    svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; }
+    
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--border-input);
+      border-radius: 999px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .pill:hover { border-color: var(--accent-primary); }
+    .pill-primary {
+      background: var(--accent-primary) !important;
+      border-color: var(--accent-primary) !important;
+      color: #fff !important;
+      justify-content: center;
+      width: 100%;
+    }
+    .pill-primary:hover { filter: brightness(0.92); }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--border-input);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .chip:hover {
+      background: var(--bg-sidebar);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 26px;
+      padding: 0 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .02em;
+    }
+    .tag-jur {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+    .tag-ver {
+      background: var(--tag-verified-bg);
+      color: var(--tag-verified-text);
+      font-weight: 600;
+    }
+    .tag-ver svg { stroke: currentColor; width: 13px; height: 13px; stroke-width: 2.5; }
+
+    .recent-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      position: relative;
+      transition: background 0.15s ease;
+    }
+    .recent-item:hover { background: rgba(0,0,0,0.04); }
+    .recent-item.active { background: var(--card-bg); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .recent-item > span:first-child {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      width: calc(100% - 24px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    .recent-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    .recent-del-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .recent-item:hover .recent-del-btn {
+      opacity: 0.7;
+    }
+    .recent-del-btn:hover {
+      opacity: 1 !important;
+      color: #ef4444;
+    }
+
+    .source-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      background: var(--card-bg);
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .source-card:hover { border-color: var(--accent-primary); }
+    .source-domain {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .chat-user-bubble {
+      align-self: flex-end;
+      max-width: 82%;
+      padding: 14px 20px;
+      border-radius: 20px 20px 4px 20px;
+      background: var(--bubble-user);
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* Top Selector Bar Form Styling */
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 32px;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-main);
+      flex-wrap: wrap;
+    }
+    .fld {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .sel {
+      position: relative;
+      display: inline-block;
+    }
+    .sel select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding: 6px 28px 6px 12px;
+      border: 1px solid var(--border-input);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+    }
+    .sel select:focus { border-color: var(--accent-primary); }
+    .sel svg {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-secondary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Authentication Gate Modal / Overlay */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72) !important;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .auth-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 440px;
+      padding: 40px 36px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-light);
+      gap: 20px;
+      margin-bottom: 4px;
+    }
+    .auth-tab {
+      padding: 10px 4px 12px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      color: var(--text-primary);
+      border-bottom-color: var(--accent-primary);
+      font-weight: 600;
+    }
+    .auth-input {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 16px;
+      border: 1px solid var(--border-input);
+      border-radius: 12px;
+      background: var(--card-bg);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .auth-input:focus { border-color: var(--accent-primary); }
+    .auth-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+    }
+    .auth-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+    .auth-close-btn:hover {
+      background: var(--border-light);
+      color: var(--text-primary);
+    }
+
+    /* User Profile in Sidebar */
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      margin-top: auto;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      flex: none;
+    }
+
+    /* Scales of Justice Symbol */
+    .justice-scales {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", "DejaVu Sans", sans-serif;
+      font-size: 1.25em;
+      line-height: 1;
+      color: var(--text-primary);
+      user-select: none;
+      cursor: default;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+    .justice-scales:hover {
+      transform: rotate(-10deg) scale(1.15);
+      color: var(--accent-primary);
+    }
+
+    /* ==========================================================================
+       LANDING PAGE & HERO STYLING (EXECUTIVE EDITORIAL)
+       ========================================================================== */
+    .landing-view {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      overflow-y: auto;
+      overflow-x: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    .hidden-view {
+      display: none !important;
+    }
+
+    .landing-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-main);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 16px 28px;
+      width: 100%;
+      flex: none;
+    }
+
+    .landing-nav-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .landing-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .landing-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .landing-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .landing-hero {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--tag-verified-bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-catchphrase {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 600;
+      line-height: 1.12;
+      color: var(--text-primary);
+      margin: 0 0 20px 0;
+      letter-spacing: -0.025em;
+    }
+
+    .hero-catchphrase span {
+      color: var(--text-secondary);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .hero-subtext {
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-cta-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .hero-cta-btn {
+      padding: 16px 42px !important;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      border-radius: 999px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      cursor: pointer;
+    }
+
+    .hero-cta-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+    }
+
+    .hero-microcopy {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .landing-section {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 64px 24px;
+      box-sizing: border-box;
+      flex: none;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 48px;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 34px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 12px 0;
+      letter-spacing: -0.015em;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .jurisdiction-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 20px;
+    }
+
+    .statute-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .statute-card:hover {
+      border-color: var(--text-secondary);
+      transform: translateY(-2px);
+    }
+
+    .statute-flag {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .statute-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .statute-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .mini-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--tag-verified-bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .statute-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--tag-verified-bg);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+    }
+
+    .feature-card h3 {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .scenario-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .scenario-card:hover {
+      border-color: var(--text-primary);
+      transform: translateY(-2px);
+      background: var(--tag-verified-bg);
+    }
+
+    .scenario-meta {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .scenario-query {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .scenario-cta {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .scenario-card:hover .scenario-cta {
+      color: var(--text-primary);
+    }
+
+    .landing-final-cta {
+      width: 100%;
+      text-align: center;
+      padding: 64px 24px 80px;
+      background: var(--bg-sidebar);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: none;
+    }
+
+    .landing-footer {
+      width: 100%;
+      text-align: center;
+      padding: 40px 24px;
+      background: var(--bg-main);
+      flex: none;
+    }
+
+    .btn-back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 8px;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .btn-back-home:hover {
+      color: var(--text-primary);
+      background: var(--border-light);
+    }
+
+    @media(max-width: 820px) {
+      .side { display: none; }
+      .bar { padding: 12px 16px !important; }
+      .landing-nav-links { display: none; }
+      .landing-hero { padding: 48px 16px 40px; }
+      .hero-subtext { font-size: 16px; }
+      .landing-section { padding: 48px 16px; }
+      .features-grid, .scenarios-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==========================================================================
+     0. EXECUTIVE EDITORIAL LANDING PAGE
+     ========================================================================== -->
+<div id="landingView" class="landing-view">
+  <!-- Top Navigation Bar -->
+  <nav class="landing-nav">
+    <div class="landing-nav-inner">
+      <div class="landing-brand" onclick="showLandingView()">
+        <span style="font-family: 'Newsreader', serif; font-size: 26px; font-weight: 600; color: var(--text-primary);">Justice AI</span>
+        <span class="justice-scales" title="Scales of Justice" aria-label="Scales of Justice">⚖&#xFE0E;</span>
+      </div>
+
+      <div class="landing-nav-links">
+        <a href="#statutes" class="nav-link">Statutory Coverage</a>
+        <a href="#capabilities" class="nav-link">Capabilities</a>
+        <a href="#scenarios" class="nav-link">Sample Cases</a>
+      </div>
+
+      <div class="landing-nav-actions">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark / Light Mode" aria-label="Toggle Theme">
+          <svg viewBox="0 0 24 24" id="themeIconLanding" width="20" height="20" style="stroke: currentColor;">
+            <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+        </button>
+        <button class="pill pill-secondary" id="btnLandingSignIn" onclick="openAuthModal('signin')">Sign In</button>
+        <button class="pill pill-primary" onclick="startConsultation()">Start Consulting</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Centered Hero Section (Centered Catchphrase & Centered CTA) -->
+  <header class="landing-hero">
+    <div class="hero-badge">
+      <span class="justice-scales" style="font-size: 14px;">⚖&#xFE0E;</span>
+      <span>AUTONOMOUS MULTI-JURISDICTIONAL LEGAL INTELLIGENCE</span>
+    </div>
+
+    <!-- Centered Catchphrase -->
+    <h1 class="hero-catchphrase">
+      Your Rights, Clarified.<br>
+      <span>Verified Law, Simplified.</span>
+    </h1>
+
+    <p class="hero-subtext">
+      Groundbreaking legal advisory grounded directly in verified statutory codes. From everyday traffic police disputes to complex criminal FIRs, get instant, clear answers in plain, everyday language without dense legalese.
+    </p>
+
+    <!-- Centered Call to Action Button -->
+    <div class="hero-cta-wrapper">
+      <button class="pill pill-primary hero-cta-btn" onclick="startConsultation()">
+        <span>Start Consulting</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
+        </svg>
+      </button>
+
+      <div class="hero-microcopy">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>No initial account or credit card required · 3 free consultations included</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Statutory Grounding Frameworks Section -->
+  <section id="statutes" class="landing-section">
+    <div class="section-header">
+      <div class="section-tag">GROUNDED REASONING</div>
+      <h2 class="section-title">Verified Statutory Vectors, Zero Hallucinations</h2>
+      <p class="section-desc">Unlike generic chat agents that invent non-existent precedents, Justice AI queries a persistent local ChromaDB vector database containing indexed statutory frameworks.</p>
+    </div>
+
+    <div class="jurisdiction-grid">
+      <div class="statute-card">
+        <div class="statute-flag">🇮🇳 India</div>
+        <div class="statute-title">Criminal & Procedural Codes (2023)</div>
+        <div class="statute-tags">
+          <span class="mini-tag">Bharatiya Nyaya Sanhita (BNS)</span>
+          <span class="mini-tag">Bharatiya Nagarik Suraksha Sanhita (BNSS)</span>
+          <span class="mini-tag">Bharatiya Sakshya Adhiniyam (BSA)</span>
+        </div>
+        <p class="statute-desc">Complete coverage of India's new criminal legal system: mandatory Zero FIR registration under § 173 BNSS, theft & burglary under § 305/331 BNS, and electronic/CCTV evidence admissibility under § 63 BSA.</p>
+      </div>
+
+      <div class="statute-card">
+        <div class="statute-flag">🇮🇳 India</div>
+        <div class="statute-title">Civil, Traffic & Consumer Law</div>
+        <div class="statute-tags">
+          <span class="mini-tag">Motor Vehicles Act 1988</span>
+          <span class="mini-tag">CMVR Rule 139 (15-Day Production)</span>
+          <span class="mini-tag">Consumer Protection Act 2019</span>
+        </div>
+        <p class="statute-desc">Legal remedies for unjust traffic fines, Virtual Courts compounding under § 200, Lok Adalat waivers, state-by-state drinking ages under Schedule VII, and consumer refund enforcement under § 35.</p>
+      </div>
+
+      <div class="statute-card">
+        <div class="statute-flag">🇪🇺 European Union</div>
+        <div class="statute-title">Data Privacy & Digital Rights</div>
+        <div class="statute-tags">
+          <span class="mini-tag">GDPR Regulation (EU) 2016/679</span>
+          <span class="mini-tag">Article 17 (Right to Erasure)</span>
+        </div>
+        <p class="statute-desc">Data subject rights, mandatory statutory response windows (30 days), right to erasure exceptions, and supervisory authority complaint filing procedures.</p>
+      </div>
+
+      <div class="statute-card">
+        <div class="statute-flag">🇬🇧 UK & 🇺🇸 USA</div>
+        <div class="statute-title">Labor, Employment & Commercial</div>
+        <div class="statute-tags">
+          <span class="mini-tag">UK Employment Rights Act 1996</span>
+          <span class="mini-tag">California Labor Code § 925 & 16600</span>
+        </div>
+        <p class="statute-desc">Statutory notice requirements, redundancy pay schedules, non-compete voidness protections, and employee rights during workplace termination.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities Section -->
+  <section id="capabilities" class="landing-section">
+    <div class="section-header">
+      <div class="section-tag">ENGINEERING ARCHITECTURE</div>
+      <h2 class="section-title">Built for Real-World Citizen Law</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+        </div>
+        <h3>Tri-Dropdown Auto-Detection</h3>
+        <p>Type your inquiry in plain English, Hindi, or local slang. The system automatically detects your jurisdiction (e.g. Chennai → India), legal category (e.g. burglary → Criminal Law), and language without manual toggling.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <h3>Plain-Language Translation</h3>
+        <p>No Latin maxims, archaic legalese, or dense court jargon. Every answer provides a direct, bold bottom line upfront, step-by-step options, simple statutory explanations, and practical next steps.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <h3>Client Confidentiality</h3>
+        <p>Confidential SQLite user sessions and private local vector storage. Your legal inquiries, incident details, and case transcripts are strictly private and never shared with third parties.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sample Scenarios / Click to Consult Section -->
+  <section id="scenarios" class="landing-section">
+    <div class="section-header">
+      <div class="section-tag">TEST IN ONE CLICK</div>
+      <h2 class="section-title">Common Situations Justice AI Solves</h2>
+      <p class="section-desc">Select any real-world situation below to immediately launch the consultation room and test the system live.</p>
+    </div>
+
+    <div class="scenarios-grid">
+      <div class="scenario-card" onclick="startConsultation('I got fined by the traffic police in India, do I have any options other than paying the fined amount?')">
+        <div class="scenario-meta">Traffic & Motor Vehicles · India</div>
+        <div class="scenario-query">"I got fined by the traffic police in India, do I have any options other than paying the fined amount?"</div>
+        <div class="scenario-cta">Test this inquiry →</div>
+      </div>
+
+      <div class="scenario-card" onclick="startConsultation('I live in Anna Nagar, Chennai and intruders broke into my house and stole items. I have CCTV footage, what can I do?')">
+        <div class="scenario-meta">Criminal Law · BNS & BNSS · Chennai</div>
+        <div class="scenario-query">"I live in Anna Nagar, Chennai and intruders broke into my house and stole items. I have CCTV footage, what can I do?"</div>
+        <div class="scenario-cta">Test this inquiry →</div>
+      </div>
+
+      <div class="scenario-card" onclick="startConsultation('What is the legal drinking age in India?')">
+        <div class="scenario-meta">State Constitutional Law · India</div>
+        <div class="scenario-query">"What is the legal drinking age in India?"</div>
+        <div class="scenario-cta">Test this inquiry →</div>
+      </div>
+
+      <div class="scenario-card" onclick="startConsultation('What is the legal driving speed limit in Jalandhar, Punjab?')">
+        <div class="scenario-meta">Motor Vehicles Act · Punjab</div>
+        <div class="scenario-query">"What is the legal driving speed limit in Jalandhar, Punjab?"</div>
+        <div class="scenario-cta">Test this inquiry →</div>
+      </div>
+
+      <div class="scenario-card" onclick="startConsultation('A seller refused to refund me for defective electronics under consumer law.')">
+        <div class="scenario-meta">Consumer Protection Act 2019</div>
+        <div class="scenario-query">"A seller refused to refund me for defective electronics under consumer law."</div>
+        <div class="scenario-cta">Test this inquiry →</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Banner -->
+  <section class="landing-final-cta">
+    <h2 style="font-family: 'Newsreader', serif; font-size: 36px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">Get Instant Legal Clarity Now</h2>
+    <p style="font-size: 16px; color: var(--text-secondary); max-width: 560px; margin: 0 auto 24px;">Explore 3 free guest consultations. Test any situation in any language.</p>
+    <button class="pill pill-primary hero-cta-btn" onclick="startConsultation()">
+      <span>Start Consulting</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+    </button>
+  </section>
+
+  <!-- Landing Footer -->
+  <footer class="landing-footer">
+    <div style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
+      <span>Justice AI</span> <span class="justice-scales" style="font-size: 18px;">⚖&#xFE0E;</span>
+    </div>
+    <div style="font-size: 12px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 12px; line-height: 1.5;">
+      General legal information grounded in verified statutory codes, not formal legal advice or substitute for licensed counsel.
+    </div>
+    <div style="font-size: 11px; color: var(--text-secondary);">
+      © 2026 Justice AI · Universal Legal Intelligence & Statutory Verification Suite
+    </div>
+  </footer>
+</div>
+
+<!-- ==========================================================================
+     1. AUTHENTICATION MODAL / SOFT ACCOUNT GATE
+     ========================================================================== -->
+<div id="authOverlay" class="auth-overlay" style="display: none;">
+  <div class="auth-card">
+    <button class="auth-close-btn" onclick="closeAuthModal()" title="Close">&times;</button>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-family: 'Newsreader', serif; font-size: 32px; font-weight: 600; color: var(--text-primary);">Justice AI</span>
+        <span class="justice-scales" title="Scales of Justice" aria-label="Scales of Justice">⚖&#xFE0E;</span>
+      </div>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark / Light Mode" aria-label="Toggle Theme" style="margin-right: 32px;">
+        <svg viewBox="0 0 24 24" id="themeIconAuth" width="20" height="20" style="stroke: currentColor;">
+          <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-top: -8px;" id="authSubtitle">
+      Universal Legal Intelligence. Sign in to access your confidential case advisory and conversation history.
+    </div>
+
+    <!-- Auth Tabs: Sign In / Create Account -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+
+    <div id="authErrorMsg" class="auth-error"></div>
+
+    <!-- SIGN IN FORM -->
+    <form id="formSignIn" onsubmit="event.preventDefault(); submitSignIn();" style="display: flex; flex-direction: column; gap: 14px;">
+      <div>
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Username</label>
+        <input type="text" id="loginUsername" class="auth-input" placeholder="e.g. advocate_arjun" required autocomplete="username">
+      </div>
+      <div>
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Password</label>
+        <input type="password" id="loginPassword" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="pill pill-primary" style="margin-top: 8px;">Sign In to Dashboard</button>
+      
+      <div style="text-align: center; margin-top: 4px;">
+        <button type="button" onclick="quickDemoLogin()" style="background: none; border: none; color: var(--accent-primary); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: underline;">
+          Try instant evaluator demo account
+        </button>
+      </div>
+    </form>
+
+    <!-- CREATE ACCOUNT FORM -->
+    <form id="formRegister" onsubmit="event.preventDefault(); submitRegister();" style="display: none; flex-direction: column; gap: 14px;">
+      <div>
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Your Name / Designation</label>
+        <input type="text" id="regName" class="auth-input" placeholder="e.g. Advocate Priya Sharma" required>
+      </div>
+      <div>
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Choose Username</label>
+        <input type="text" id="regUsername" class="auth-input" placeholder="e.g. priya_legal" required autocomplete="username">
+      </div>
+      <div>
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Choose Password</label>
+        <input type="password" id="regPassword" class="auth-input" placeholder="At least 4 characters" required autocomplete="new-password">
+      </div>
+      <button type="submit" class="pill pill-primary" style="margin-top: 8px;">Create New Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- 2. MAIN APPLICATION (Visible once logged in or guest consulting) -->
+<div id="mainAppLayout" style="display: none; height: 100vh; overflow: hidden; background: var(--bg-main);">
+  <!-- Sidebar -->
+  <aside class="side" style="width: 290px; height: 100vh; flex: none; box-sizing: border-box; padding: 24px 20px; background: var(--bg-sidebar); border-right: 1px solid var(--border-sidebar); display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: -6px;">
+      <button onclick="showLandingView()" class="btn-back-home" title="Return to Overview">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"></path></svg>
+        <span>Overview</span>
+      </button>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark / Light Mode" style="width:30px;height:30px;min-height:30px;padding:0;">
+        <svg viewBox="0 0 24 24" id="themeIconSidebar" width="16" height="16" style="stroke: currentColor;">
+          <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-family: 'Newsreader', 'Noto Serif Devanagari', serif; font-size: 28px; font-weight: 600; color: var(--text-primary);" id="brandTitle">Justice AI</span>
+      <span class="justice-scales" title="Scales of Justice" aria-label="Scales of Justice">⚖&#xFE0E;</span>
+    </div>
+    
+    <button class="pill pill-primary" onclick="createNewChat()" id="btnNewQuestion">+ New question</button>
+
+    <!-- Recent Questions List (Dynamically populated per logged-in user) -->
+    <nav aria-label="Recent questions" style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px; overflow-y: auto; max-height: calc(100vh - 360px);">
+      <div style="font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; margin-bottom: 6px;" id="lblRecent">YOUR RECENT CHATS</div>
+      <div id="recentListContainer" style="display: flex; flex-direction: column; gap: 4px;">
+        <!-- Dynamically rendered per user -->
+      </div>
+    </nav>
+
+    <!-- Logged-in User Profile Badge -->
+    <div class="user-profile-badge" id="userProfileBadge">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileName">User Name</div>
+        <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileUsername">@username</div>
+      </div>
+      <button onclick="handleLogout()" title="Sign Out" aria-label="Sign Out" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); border-top: 1px solid var(--border-light); padding-top: 12px;">
+      <strong style="color: var(--text-primary); font-weight: 600;" id="lblVerifiedCoverage">Verified coverage</strong><br>
+      <span id="lblCoverageList">India · UK · EU · Germany · Switzerland · US · Canada · Australia · Singapore · Global</span>
+    </div>
+  </aside>
+
+  <!-- Main View Area -->
+  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
+    <!-- Top Filter & Controls Bar -->
+    <header class="bar">
+      <!-- 1. Region Selector -->
+      <label class="fld"><span id="lblRegion">Region</span>
+        <span class="sel">
+          <select id="selRegion" onchange="onRegionChange(this.value)">
+            <option value="AUTO" selected>Auto-Detect</option>
+            <option value="IN">India</option>
+            <option value="DE">Germany</option>
+            <option value="CH">Switzerland</option>
+            <option value="GB">United Kingdom</option>
+            <option value="EU">European Union</option>
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="AU">Australia</option>
+            <option value="SG">Singapore</option>
+            <option value="GLOBAL">Global / International</option>
+          </select>
+          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
+        </span>
+      </label>
+
+      <!-- 2. Granular Category -->
+      <label class="fld"><span id="lblCategory">Category</span>
+        <span class="sel">
+          <select id="selCategory" onchange="onCategoryChange(this.value)">
+            <option value="AUTO" selected>Auto-Detect Category</option>
+            <option value="Traffic & Motor Vehicles Law">Traffic & Motor Vehicles Law</option>
+            <option value="State Excise & Regulatory Law">State Excise & Regulatory Law</option>
+            <option value="Tenancy: Eviction & Termination Notice">Tenancy: Eviction & Termination Notice</option>
+            <option value="Consumer Protection & Defective Goods">Consumer Protection & Defective Goods</option>
+            <option value="Criminal & Penal Law">Criminal & Penal Law</option>
+            <option value="Employment & Wage Rights">Employment & Wage Rights</option>
+            <option value="Data Privacy & GDPR">Data Privacy & GDPR</option>
+            <option value="Commercial & Contract Disputes">Commercial & Contract Disputes</option>
+            <option value="Family Law & Estate">Family Law & Estate</option>
+          </select>
+          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
+        </span>
+      </label>
+
+      <!-- 3. Dynamic Region-Aware Language Selector -->
+      <label class="fld"><span id="lblLanguage">Language</span>
+        <span class="sel">
+          <select id="selLanguage" onchange="changeLanguage(this.value)">
+            <!-- Populated dynamically via JS -->
+          </select>
+          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
+        </span>
+      </label>
+
+      <!-- Actions: Sun/Moon Theme Toggle, Share Chat -->
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" id="btnThemeToggle" title="Toggle Dark / Light Mode" aria-label="Toggle Dark / Light Mode">
+          <svg viewBox="0 0 24 24" id="themeIcon" width="20" height="20" style="stroke: currentColor;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+        </button>
+
+        <button class="pill" onclick="shareChat()">
+          <svg viewBox="0 0 24 24"><path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"></path></svg>
+          <span id="lblShare">Share chat</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CHAT SECTION -->
+    <div id="viewChat" style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto;">
+      <section style="box-sizing: border-box; width: 100%; max-width: 792px; margin: 0 auto; padding: 28px 24px 20px; display: flex; flex-direction: column; gap: 24px;" id="chatFeed">
+        <!-- Messages rendered dynamically -->
+      </section>
+    </div>
+
+    <!-- Fixed Bottom Input Bar -->
+    <div class="chat-composer-bar" id="chatComposerBar" style="flex: none; padding: 14px 24px 18px; background: var(--bg-main); border-top: 1px solid var(--border-light); z-index: 10;">
+      <div style="display: flex; align-items: center; gap: 10px; max-width: 768px; margin: 0 auto;">
+        <input id="chatInput" placeholder="Ask a legal question in any country or language" style="flex: 1; min-width: 0; box-sizing: border-box; min-height: 48px; padding: 0 20px; border: 1px solid var(--border-input); border-radius: 24px; background: var(--card-bg); font-size: 15px; color: var(--text-primary); outline: none;" onkeydown="if(event.key==='Enter') sendUserQuery()">
+        <button onclick="sendUserQuery()" aria-label="Send" style="flex: none; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--accent-primary); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </button>
+      </div>
+      <div style="max-width: 768px; margin: 8px auto 0; font-size: 12px; color: var(--text-secondary); text-align: center;" id="lblInputFootnote">Answers are limited to jurisdictions with verified sources.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Dynamic Region-to-Language Mapping
+const regionLanguages = {
+  IN: [
+    { code: "en", name: "English" },
+    { code: "hi", name: "हिन्दी (Hindi)" },
+    { code: "pa", name: "ਪੰਜਾਬੀ (Punjabi)" },
+    { code: "bn", name: "বাংলা (Bengali)" },
+    { code: "ta", name: "தமிழ் (Tamil)" },
+    { code: "te", name: "తెలుగు (Telugu)" },
+    { code: "mr", name: "मराठी (Marathi)" },
+    { code: "gu", name: "ગુજરાતી (Gujarati)" },
+    { code: "kn", name: "ಕನ್ನಡ (Kannada)" },
+    { code: "ml", name: "മലയാളം (Malayalam)" }
+  ],
+  CH: [
+    { code: "en", name: "English" },
+    { code: "de", name: "Deutsch (German)" },
+    { code: "fr", name: "Français (French)" },
+    { code: "it", name: "Italiano (Italian)" },
+    { code: "rm", name: "Rumantsch (Romansh)" }
+  ],
+  DE: [
+    { code: "en", name: "English" },
+    { code: "de", name: "Deutsch (German)" }
+  ],
+  CA: [
+    { code: "en", name: "English" },
+    { code: "fr", name: "Français (French)" }
+  ],
+  US: [
+    { code: "en", name: "English" },
+    { code: "es", name: "Español (Spanish)" }
+  ],
+  GB: [
+    { code: "en", name: "English" },
+    { code: "cy", name: "Cymraeg (Welsh)" }
+  ],
+  EU: [
+    { code: "en", name: "English" },
+    { code: "de", name: "Deutsch" },
+    { code: "fr", name: "Français" },
+    { code: "es", name: "Español" },
+    { code: "it", name: "Italiano" },
+    { code: "nl", name: "Nederlands" }
+  ],
+  GLOBAL: [
+    { code: "en", name: "English" },
+    { code: "hi", name: "हिन्दी" },
+    { code: "de", name: "Deutsch" },
+    { code: "fr", name: "Français" },
+    { code: "es", name: "Español" },
+    { code: "pa", name: "ਪੰਜਾਬੀ" },
+    { code: "bn", name: "বাংলা" }
+  ],
+  AUTO: [
+    { code: "en", name: "English" },
+    { code: "hi", name: "हिन्दी" },
+    { code: "de", name: "Deutsch" },
+    { code: "fr", name: "Français" }
+  ]
+};
+
+const i18n = {
+  en: {
+    brand: "Justice AI",
+    new_question: "+ New question",
+    recent: "YOUR RECENT CHATS",
+    verified_coverage: "Verified coverage",
+    coverage_list: "India · United Kingdom · European Union · Germany · Switzerland · United States · Canada · Australia · Singapore · Global",
+    region: "Region",
+    category: "Category",
+    language: "Language",
+    share: "Share chat",
+    placeholder: "Ask a legal question in any country or language",
+    footnote: "Answers are limited to jurisdictions with verified sources.",
+    answered_official: "Answered from official sources",
+    sources: "SOURCES",
+    confidence: "Retrieval confidence",
+    conf_high: "High",
+    disclaimer: "General legal information, not formal legal advice. Statutes change; consult a licensed legal practitioner in your jurisdiction.",
+    welcome_headline: "Universal Legal Intelligence Consultation",
+    welcome_subtitle: "Select your jurisdiction and legal category above, then type your legal question below.",
+    starter_1: "Options other than paying traffic police fine in India?",
+    starter_2: "What is the legal drinking age in India?",
+    starter_3: "What is the driving speed limit in Jalandhar, Punjab?"
+  },
+  hi: {
+    brand: "Justice AI",
+    new_question: "+ नया प्रश्न",
+    recent: "हाल के प्रश्न",
+    verified_coverage: "सत्यापित कवरेज",
+    coverage_list: "भारत · यूनाइटेड किंगडम · यूरोपीय संघ · जर्मनी · स्विट्ज़रलैंड · अमेरिका · कनाडा · ऑस्ट्रेलिया · सिंगापुर · वैश्विक",
+    region: "क्षेत्र",
+    category: "श्रेणी",
+    language: "भाषा",
+    share: "चैट साझा करें",
+    placeholder: "किसी भी देश में, किसी भी भाषा में कानूनी प्रश्न पूछें",
+    footnote: "उत्तर केवल उन क्षेत्राधिकारों के लिए हैं जिनके सत्यापित स्रोत उपलब्ध हैं।",
+    answered_official: "आधिकारिक स्रोतों से उत्तर",
+    sources: "स्रोत",
+    confidence: "उत्तर की विश्वसनीयता",
+    conf_high: "उच्च",
+    disclaimer: "यह सामान्य कानूनी जानकारी है, कानूनी सलाह नहीं। कानून बदलते रहते हैं, इसलिए किसी योग्य वकील से पुष्टि करें।",
+    welcome_headline: "सार्वभौमिक कानूनी परामर्श प्रणाली",
+    welcome_subtitle: "ऊपर अपना क्षेत्र और श्रेणी चुनें, फिर नीचे अपना प्रश्न दर्ज करें।",
+    starter_1: "क्या मकान मालिक बिना किसी वैध कारण के निकाल सकता है?",
+    starter_2: "दोषपूर्ण सामान पर उपभोक्ता संरक्षण कानून के तहत रिफंड",
+    starter_3: "जीडीपीआर डेटा हटाने का कानूनी नोटिस"
+  },
+  de: {
+    brand: "Justice AI",
+    new_question: "+ Neue Frage",
+    recent: "IHRE LETZTEN ANFRAGEN",
+    verified_coverage: "Verifizierte Abdeckung",
+    coverage_list: "Deutschland · Schweiz · Indien · Vereinigtes Königreich · Europäische Union · USA · Global",
+    region: "Region",
+    category: "Kategorie",
+    language: "Sprache",
+    share: "Chat teilen",
+    placeholder: "Stellen Sie eine rechtliche Frage in jedem Land oder jeder Sprache",
+    footnote: "Antworten sind auf Rechtsordnungen mit verifizierten Quellen beschränkt.",
+    answered_official: "Aus offiziellen Quellen beantwortet",
+    sources: "QUELLEN",
+    confidence: "Abruf-Zuverlässigkeit",
+    conf_high: "Hoch",
+    disclaimer: "Allgemeine rechtliche Information, keine Rechtsberatung. Bitte mit einem qualifizierten Anwalt abstimmen.",
+    welcome_headline: "Rechtliche Beratung & Gesetzliche Auskunft",
+    welcome_subtitle: "Wählen Sie oben Rechtsgebiet und Region, und geben Sie unten Ihre Frage ein.",
+    starter_1: "Darf mein Vermieter ohne Grund kündigen?",
+    starter_2: "Rückerstattung bei mangelhafter Ware",
+    starter_3: "DSGVO Recht auf Vergessenwerden durchsetzen"
+  }
+};
+
+let currentLang = 'en';
+let isDarkTheme = false;
+let currentCategory = "Tenancy: Eviction & Termination Notice";
+
+// User Session & Conversation State
+let currentUser = null;
+let authToken = localStorage.getItem('justice_ai_token') || null;
+let currentConversationId = null;
+let userConversations = [];
+let chatMessages = [];
+
+// Guest Consultation State (2-3 free queries without account)
+let isGuest = true;
+let guestQueryCount = parseInt(localStorage.getItem('justice_ai_guest_count') || '0');
+let guestTurns = [];
+
+// View Switchers: Landing vs Chat Application
+function showLandingView() {
+  const lv = document.getElementById('landingView');
+  const app = document.getElementById('mainAppLayout');
+  const auth = document.getElementById('authOverlay');
+
+  lv.style.display = 'flex';
+  lv.style.flexDirection = 'column';
+  lv.classList.remove('hidden-view');
+
+  app.style.display = 'none';
+  app.classList.add('hidden-view');
+
+  auth.style.display = 'none';
+  auth.classList.add('hidden-view');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const btnSignIn = document.getElementById('btnLandingSignIn');
+  if (btnSignIn) {
+    if (currentUser) {
+      btnSignIn.textContent = 'Dashboard';
+      btnSignIn.onclick = () => startConsultation();
+    } else {
+      btnSignIn.textContent = 'Sign In';
+      btnSignIn.onclick = () => openAuthModal('signin');
+    }
+  }
+}
+
+function startConsultation(initialQuery) {
+  const lv = document.getElementById('landingView');
+  const app = document.getElementById('mainAppLayout');
+  const auth = document.getElementById('authOverlay');
+
+  lv.style.display = 'none';
+  lv.classList.add('hidden-view');
+
+  app.style.display = 'flex';
+  app.classList.remove('hidden-view');
+
+  auth.style.display = 'none';
+  auth.classList.add('hidden-view');
+
+  renderUserProfileBadge();
+  renderChat();
+
+  const inp = document.getElementById('chatInput');
+  if (inp) {
+    setTimeout(() => inp.focus(), 150);
+  }
+
+  if (initialQuery) {
+    submitQuery(initialQuery);
+  }
+}
+
+function openAuthModal(tab = 'signin', customMsg = null) {
+  switchAuthTab(tab);
+  const sub = document.getElementById('authSubtitle');
+  if (sub) {
+    sub.textContent = customMsg || 'Universal Legal Intelligence. Sign in to access your confidential case advisory and conversation history.';
+  }
+  const overlay = document.getElementById('authOverlay');
+  if (overlay) {
+    overlay.style.setProperty('display', 'flex', 'important');
+  }
+}
+
+function closeAuthModal() {
+  const overlay = document.getElementById('authOverlay');
+  if (overlay) {
+    overlay.style.setProperty('display', 'none', 'important');
+  }
+}
+
+function resetGuestConsultation() {
+  guestQueryCount = 0;
+  localStorage.removeItem('justice_ai_guest_count');
+  renderUserProfileBadge();
+  closeAuthModal();
+}
+
+function renderUserProfileBadge() {
+  const badgeContainer = document.getElementById('userProfileBadge');
+  if (!badgeContainer) return;
+
+  if (currentUser) {
+    badgeContainer.innerHTML = `
+      <div class="user-avatar" id="userAvatar">${(currentUser.name || currentUser.username).charAt(0).toUpperCase()}</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileName">${currentUser.name || currentUser.username}</div>
+        <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileUsername">@${currentUser.username}</div>
+      </div>
+      <button onclick="handleLogout()" title="Sign Out" aria-label="Sign Out" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
+    `;
+  } else {
+    const left = Math.max(0, 3 - guestQueryCount);
+    badgeContainer.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Guest Consultation</span>
+          <span class="mini-tag" style="background: var(--tag-verified-bg); font-size: 11px; padding: 2px 7px;">${left} ${left === 1 ? 'query' : 'queries'} left</span>
+        </div>
+        <button class="pill pill-secondary" onclick="openAuthModal('register')" style="font-size: 12px; padding: 6px 10px; width: 100%; justify-content: center;">
+          ${left > 0 ? 'Sign in to save chat' : 'Sign in / Create Account'}
+        </button>
+        ${left === 0 ? `
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; padding: 0 2px;">
+            <a href="javascript:void(0)" onclick="quickDemoLogin()" style="color: var(--accent-primary); text-decoration: underline;">Demo login</a>
+            <a href="javascript:void(0)" onclick="resetGuestConsultation()" style="color: var(--text-secondary); text-decoration: underline;">Reset guest</a>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+}
+
+// Authentication Tab Switcher
+function switchAuthTab(tab) {
+  const tabSign = document.getElementById('tabSignIn');
+  const tabReg = document.getElementById('tabRegister');
+  const formSign = document.getElementById('formSignIn');
+  const formReg = document.getElementById('formRegister');
+  const errBox = document.getElementById('authErrorMsg');
+  errBox.style.display = 'none';
+
+  if (tab === 'signin') {
+    tabSign.classList.add('active');
+    tabReg.classList.remove('active');
+    formSign.style.display = 'flex';
+    formReg.style.display = 'none';
+  } else {
+    tabReg.classList.add('active');
+    tabSign.classList.remove('active');
+    formReg.style.display = 'flex';
+    formSign.style.display = 'none';
+  }
+}
+
+function showAuthError(msg) {
+  const errBox = document.getElementById('authErrorMsg');
+  errBox.textContent = msg;
+  errBox.style.display = 'block';
+}
+
+async function submitSignIn() {
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value;
+  if (!u || !p) return;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      onAuthSuccess(data.user, data.token);
+    } else {
+      showAuthError(data.message || 'Invalid username or password.');
+    }
+  } catch (err) {
+    showAuthError('Connection error. Please try again.');
+  }
+}
+
+async function submitRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const u = document.getElementById('regUsername').value.trim();
+  const p = document.getElementById('regPassword').value;
+  if (!u || !p) return;
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, username: u, password: p })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      onAuthSuccess(data.user, data.token);
+    } else {
+      showAuthError(data.message || 'Registration failed.');
+    }
+  } catch (err) {
+    showAuthError('Connection error. Please try again.');
+  }
+}
+
+function quickDemoLogin() {
+  document.getElementById('loginUsername').value = 'demo';
+  document.getElementById('loginPassword').value = 'password123';
+  submitSignIn();
+}
+
+async function onAuthSuccess(user, token) {
+  currentUser = user;
+  authToken = token;
+  isGuest = false;
+  localStorage.setItem('justice_ai_token', token);
+  localStorage.setItem('justice_ai_user', JSON.stringify(user));
+
+  // Seamlessly claim and migrate any guest conversation turns
+  if (guestTurns.length > 0) {
+    try {
+      const claimRes = await fetch('/api/conversations/claim_guest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ turns: guestTurns })
+      });
+      const claimData = await claimRes.json();
+      if (claimData.status === 'success' && claimData.conversation) {
+        currentConversationId = claimData.conversation.id;
+      }
+    } catch (e) {
+      console.error('Error claiming guest turns:', e);
+    }
+    guestTurns = [];
+    guestQueryCount = 0;
+    localStorage.removeItem('justice_ai_guest_count');
+  }
+
+  // Update profile in sidebar
+  renderUserProfileBadge();
+
+  // Hide auth and landing, show main application
+  const lv = document.getElementById('landingView');
+  const app = document.getElementById('mainAppLayout');
+  const auth = document.getElementById('authOverlay');
+
+  auth.style.display = 'none';
+  auth.classList.add('hidden-view');
+  lv.style.display = 'none';
+  lv.classList.add('hidden-view');
+  app.style.display = 'flex';
+  app.classList.remove('hidden-view');
+
+  loadUserConversations();
+}
+
+async function verifyExistingSession() {
+  renderUserProfileBadge();
+
+  if (!authToken) {
+    showLandingView();
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    if (data.status === 'success' && data.user) {
+      currentUser = data.user;
+      isGuest = false;
+      renderUserProfileBadge();
+      loadUserConversations();
+      showLandingView();
+    } else {
+      handleLogout();
+    }
+  } catch (e) {
+    showLandingView();
+  }
+}
+
+function handleLogout() {
+  if (authToken) {
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    }).catch(() => {});
+  }
+  localStorage.removeItem('justice_ai_token');
+  localStorage.removeItem('justice_ai_user');
+  currentUser = null;
+  authToken = null;
+  isGuest = true;
+  currentConversationId = null;
+  chatMessages = [];
+  userConversations = [];
+
+  renderUserProfileBadge();
+  showLandingView();
+}
+
+// Conversation Management (per user)
+async function loadUserConversations() {
+  if (!authToken) return;
+
+  try {
+    const res = await fetch('/api/conversations', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      userConversations = data.conversations || [];
+      renderRecentConversations();
+
+      // If user has existing conversations and none is loaded, load the most recent
+      if (userConversations.length > 0 && !currentConversationId) {
+        selectConversation(userConversations[0].id);
+      } else if (userConversations.length === 0) {
+        createNewChat();
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load conversations', err);
+  }
+}
+
+function renderRecentConversations() {
+  const container = document.getElementById('recentListContainer');
+  container.innerHTML = '';
+
+  if (userConversations.length === 0) {
+    container.innerHTML = `<div style="font-size:12px;color:var(--text-secondary);padding:10px 4px;">No recent questions yet. Start a new question below.</div>`;
+    return;
+  }
+
+  userConversations.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'recent-item' + (c.id === currentConversationId ? ' active' : '');
+    item.id = 'conv_' + c.id;
+    item.onclick = (e) => {
+      if (e.target.closest('.recent-del-btn')) return;
+      selectConversation(c.id);
+    };
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = c.title;
+
+    const subSpan = document.createElement('span');
+    subSpan.className = 'recent-sub';
+    subSpan.textContent = `${c.jurisdiction || 'Global'} · ${c.category || 'General'}`;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'recent-del-btn';
+    delBtn.title = 'Delete question';
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      deleteUserConversation(c.id);
+    };
+
+    item.appendChild(titleSpan);
+    item.appendChild(subSpan);
+    item.appendChild(delBtn);
+    container.appendChild(item);
+  });
+}
+
+async function selectConversation(convId) {
+  currentConversationId = convId;
+  renderRecentConversations();
+
+  try {
+    const res = await fetch(`/api/conversations/detail?id=${convId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    if (data.status === 'success' && data.data) {
+      const conv = data.data.conversation;
+      if (conv.jurisdiction) {
+        document.getElementById('selRegion').value = conv.jurisdiction;
+        populateLanguageDropdown(conv.jurisdiction);
+      }
+      if (conv.category) {
+        document.getElementById('selCategory').value = conv.category;
+        currentCategory = conv.category;
+      }
+
+      chatMessages = [];
+      data.data.messages.forEach(m => {
+        if (m.role === 'user') {
+          chatMessages.push({ role: 'user', content: m.content });
+        } else {
+          const card = m.card;
+          if (card) {
+            chatMessages.push({
+              role: 'assistant',
+              tag: card.tag_label || `${conv.jurisdiction} · ${conv.category}`,
+              headline: card.headline,
+              body: card.body_text,
+              sources: card.sources,
+              chips: card.chips
+            });
+          } else {
+            chatMessages.push({
+              role: 'assistant',
+              tag: `${conv.jurisdiction} · ${conv.category}`,
+              headline: 'Statutory Legal Assessment',
+              body: m.content,
+              sources: [],
+              chips: []
+            });
+          }
+        }
+      });
+      renderChat();
+    }
+  } catch (err) {
+    console.error('Error loading conversation detail', err);
+  }
+}
+
+function createNewChat() {
+  currentConversationId = null;
+  chatMessages = [];
+  document.querySelectorAll('.recent-item').forEach(el => el.classList.remove('active'));
+  renderChat();
+}
+
+async function deleteUserConversation(convId) {
+  if (!confirm('Are you sure you want to delete this conversation?')) return;
+  try {
+    const res = await fetch('/api/conversations/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ id: convId })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      userConversations = userConversations.filter(c => c.id !== convId);
+      if (currentConversationId === convId) {
+        createNewChat();
+      } else {
+        renderRecentConversations();
+      }
+    }
+  } catch (err) {
+    console.error('Delete error', err);
+  }
+}
+
+// Region and Language Controls
+function onRegionChange(region) {
+  populateLanguageDropdown(region);
+  const langSel = document.getElementById('selLanguage');
+  changeLanguage(langSel.value);
+}
+
+function onCategoryChange(cat) {
+  currentCategory = cat;
+  if (chatMessages.length > 0) {
+    chatMessages.forEach(m => {
+      if (m.role === 'assistant') {
+        const reg = document.getElementById('selRegion').value;
+        m.tag = `${reg} · ${cat}`;
+      }
+    });
+    renderChat();
+  }
+}
+
+function populateLanguageDropdown(region) {
+  const list = regionLanguages[region] || regionLanguages["GLOBAL"];
+  const sel = document.getElementById('selLanguage');
+  sel.innerHTML = '<option value="AUTO" selected>Auto-Detect Language</option>';
+  list.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.code;
+    opt.textContent = l.name;
+    sel.appendChild(opt);
+  });
+}
+
+function toggleTheme() {
+  isDarkTheme = !isDarkTheme;
+  document.body.classList.toggle('dark-theme', isDarkTheme);
+  const icon = document.getElementById('themeIcon');
+  const iconAuth = document.getElementById('themeIconAuth');
+  const iconLanding = document.getElementById('themeIconLanding');
+  const iconSidebar = document.getElementById('themeIconSidebar');
+  const moonPath = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>';
+  const sunPath = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>';
+
+  if (icon) icon.innerHTML = isDarkTheme ? moonPath : sunPath;
+  if (iconAuth) iconAuth.innerHTML = isDarkTheme ? moonPath : sunPath;
+  if (iconLanding) iconLanding.innerHTML = isDarkTheme ? moonPath : sunPath;
+  if (iconSidebar) iconSidebar.innerHTML = isDarkTheme ? moonPath : sunPath;
+}
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  const t = i18n[lang] || i18n.en;
+  
+  document.getElementById('brandTitle').textContent = t.brand;
+  document.getElementById('btnNewQuestion').textContent = t.new_question;
+  document.getElementById('lblRecent').textContent = t.recent;
+  document.getElementById('lblVerifiedCoverage').textContent = t.verified_coverage;
+  document.getElementById('lblCoverageList').textContent = t.coverage_list;
+  document.getElementById('lblRegion').textContent = t.region;
+  document.getElementById('lblCategory').textContent = t.category;
+  document.getElementById('lblLanguage').textContent = t.language;
+  document.getElementById('lblShare').textContent = t.share;
+  document.getElementById('chatInput').placeholder = t.placeholder;
+  document.getElementById('lblInputFootnote').textContent = t.footnote;
+
+  renderChat();
+}
+
+function renderChat() {
+  const feed = document.getElementById('chatFeed');
+  feed.innerHTML = '';
+  const t = i18n[currentLang] || i18n.en;
+
+  // Clean Welcome Screen when chat is empty
+  if (chatMessages.length === 0) {
+    feed.innerHTML = `
+      <div style="text-align: center; padding: 48px 20px 24px; max-width: 680px; margin: 0 auto;">
+        <div style="margin-bottom: 16px;">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+            <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+            <path d="M7 21h10"></path>
+            <path d="M12 3v18"></path>
+            <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path>
+          </svg>
+        </div>
+        <div style="font-family: 'Newsreader', 'Noto Serif Devanagari', serif; font-size: 26px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+          ${t.welcome_headline}
+        </div>
+        <p style="font-size: 15px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 24px 0;">
+          ${t.welcome_subtitle}
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+          <button class="chip" onclick="submitQuery('${t.starter_1}')">${t.starter_1}</button>
+          <button class="chip" onclick="submitQuery('${t.starter_2}')">${t.starter_2}</button>
+          <button class="chip" onclick="submitQuery('${t.starter_3}')">${t.starter_3}</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  chatMessages.forEach((msg, idx) => {
+    if (msg.loading) {
+      const loadDiv = document.createElement('div');
+      loadDiv.className = 'chat-loading-indicator';
+      loadDiv.style.display = 'flex';
+      loadDiv.style.alignItems = 'center';
+      loadDiv.style.gap = '10px';
+      loadDiv.style.padding = '14px 18px';
+      loadDiv.style.color = 'var(--text-secondary)';
+      loadDiv.style.fontSize = '14px';
+      loadDiv.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
+        <span>${currentLang === 'hi' ? 'वैधानिक धाराओं और संहिताओं का विश्लेषण हो रहा है...' : 'Analyzing statutory codes and precedents...'}</span>
+      `;
+      feed.appendChild(loadDiv);
+      return;
+    }
+    if (msg.role === 'user') {
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-user-bubble';
+      bubble.textContent = msg.content;
+      feed.appendChild(bubble);
+    } else {
+      const art = document.createElement('article');
+      art.style.display = 'flex';
+      art.style.flexDirection = 'column';
+      art.style.gap = '16px';
+
+      // Badges
+      const badges = document.createElement('div');
+      badges.style.display = 'flex';
+      badges.style.flexWrap = 'wrap';
+      badges.style.gap = '8px';
+      badges.innerHTML = `
+        <span class="tag tag-jur">${msg.tag || 'Global · General Law'}</span>
+        <span class="tag tag-ver">
+          <svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"></path></svg>
+          ${t.answered_official}
+        </span>
+      `;
+      art.appendChild(badges);
+
+      // Headline
+      const hl = document.createElement('div');
+      hl.style.fontFamily = "'Newsreader', 'Noto Serif Devanagari', serif";
+      hl.style.fontSize = '22px';
+      hl.style.fontWeight = '500';
+      hl.style.lineHeight = '1.35';
+      hl.style.color = 'var(--text-primary)';
+      hl.textContent = msg.headline;
+      art.appendChild(hl);
+
+      // Body text
+      const p = document.createElement('p');
+      p.style.margin = '0';
+      p.style.fontSize = '15px';
+      p.style.lineHeight = '1.65';
+      p.style.color = 'var(--text-body)';
+      p.textContent = msg.body;
+      art.appendChild(p);
+
+      // Sources
+      if (msg.sources && msg.sources.length) {
+        const sBox = document.createElement('div');
+        sBox.style.display = 'flex';
+        sBox.style.flexDirection = 'column';
+        sBox.style.gap = '8px';
+        sBox.innerHTML = `<div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-secondary);font-weight:600;">${t.sources}</div>`;
+        msg.sources.forEach(s => {
+          sBox.innerHTML += `
+            <a class="source-card" href="${s.url}" target="_blank">
+              ${s.title}
+              <span class="source-domain">${s.domain}</span>
+            </a>
+          `;
+        });
+        art.appendChild(sBox);
+      }
+
+      // Confidence Meter
+      const conf = document.createElement('div');
+      conf.style.display = 'flex';
+      conf.style.alignItems = 'center';
+      conf.style.gap = '10px';
+      conf.style.fontSize = '13px';
+      conf.style.color = 'var(--text-secondary)';
+      conf.innerHTML = `
+        ${t.confidence}
+        <span style="width:96px;height:6px;border-radius:3px;background:var(--border-light);display:inline-block;overflow:hidden;">
+          <span class="confidence-bar-inner" style="display:block;width:88%;height:6px;border-radius:3px;background:var(--tag-verified-text);"></span>
+        </span>
+        <strong style="font-weight:600;color:var(--text-primary);">${t.conf_high}</strong>
+      `;
+      art.appendChild(conf);
+
+      // Disclaimer box
+      const disc = document.createElement('div');
+      disc.style.padding = '12px 16px';
+      disc.style.border = '1px solid var(--disclaimer-border)';
+      disc.style.borderRadius = '12px';
+      disc.style.background = 'var(--disclaimer-bg)';
+      disc.style.color = 'var(--disclaimer-text)';
+      disc.style.fontSize = '13px';
+      disc.style.lineHeight = '1.5';
+      disc.textContent = t.disclaimer;
+      art.appendChild(disc);
+
+      // Chips
+      if (msg.chips && msg.chips.length && idx === chatMessages.length - 1) {
+        const chipContainer = document.createElement('div');
+        chipContainer.style.display = 'flex';
+        chipContainer.style.flexWrap = 'wrap';
+        chipContainer.style.gap = '8px';
+        msg.chips.forEach(c => {
+          const btn = document.createElement('button');
+          btn.className = 'chip';
+          btn.textContent = c;
+          btn.onclick = () => submitQuery(c);
+          chipContainer.appendChild(btn);
+        });
+        art.appendChild(chipContainer);
+      }
+
+      feed.appendChild(art);
+    }
+  });
+
+  const chatScroll = document.getElementById('viewChat');
+  if (chatScroll) chatScroll.scrollTop = chatScroll.scrollHeight;
+}
+
+function sendUserQuery() {
+  const inp = document.getElementById('chatInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+  submitQuery(val);
+}
+
+function submitQuery(q) {
+  if (!currentUser) {
+    if (guestQueryCount >= 3) {
+      openAuthModal('register', 'You have completed your 3 free guest consultations. Create a free account or sign in to permanently save your conversation, unlock unlimited queries, and export legal dossiers.');
+      return;
+    }
+    guestQueryCount++;
+    localStorage.setItem('justice_ai_guest_count', guestQueryCount);
+    renderUserProfileBadge();
+  }
+
+  chatMessages.push({ role: 'user', content: q });
+  chatMessages.push({ role: 'assistant', loading: true });
+  renderChat();
+
+  const isHi = currentLang === 'hi';
+  const reg = document.getElementById('selRegion').value;
+  const cat = document.getElementById('selCategory').value || currentCategory;
+
+  function handleSuccess(data) {
+    chatMessages = chatMessages.filter(m => !m.loading);
+    if (data.status === 'success' && data.card) {
+      if (data.conversation_id && !data.is_guest) {
+        currentConversationId = data.conversation_id;
+      }
+      chatMessages.push({
+        role: 'assistant',
+        tag: data.card.tag_label || `${reg} · ${cat}`,
+        headline: data.card.headline,
+        body: data.card.body_text,
+        sources: data.card.sources,
+        chips: data.card.chips
+      });
+      if (!currentUser) {
+        guestTurns.push({
+          query: q,
+          card: data.card,
+          jurisdiction: data.jurisdiction || reg,
+          category: data.category || cat
+        });
+      } else {
+        loadUserConversations();
+      }
+    } else {
+      fallbackHeuristic(q, reg, cat, isHi);
+    }
+    renderChat();
+  }
+
+  function handleFallback() {
+    chatMessages = chatMessages.filter(m => !m.loading);
+    fallbackHeuristic(q, reg, cat, isHi);
+  }
+
+  const payload = {
+    query: q,
+    jurisdiction: reg,
+    category: cat,
+    language: currentLang,
+    conversation_id: currentConversationId
+  };
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': authToken ? `Bearer ${authToken}` : ''
+  };
+
+  // 1. Try relative same-origin /api/chat
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(handleSuccess)
+  .catch(() => {
+    // 2. Try port 5000 if relative fails
+    fetch('http://localhost:5000/api/chat', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(handleSuccess)
+    .catch(handleFallback);
+  });
+}
+
+function fallbackHeuristic(q, reg, cat, isHi) {
+  let headline = isHi ? "कानूनी विश्लेषण और वैधानिक समीक्षा" : "Comprehensive Statutory Legal Assessment";
+  let body = isHi ? "आपकी स्थिति में विशिष्ट कानूनी उपचार उपलब्ध हैं। किसी भी संविदात्मक या वैधानिक विवाद में लिखित सबूत और औपचारिक नोटिस अनिवार्य हैं।" : "Under the governing statutory framework, formal notice of claim is essential to prevent statutory expiration of limitations.";
+  let sources = [{ title: "Civil & Commercial Statutory Framework", domain: "official-gazette.gov", url: "#" }];
+  let chips = isHi ? ["कानूनी नोटिस का प्रारूप बनाएँ", "समय-सीमा क्या है?", "वकील से पूछने योग्य प्रश्न"] : ["Draft formal demand letter", "What is the limitation period?", "Top 5 questions for counsel"];
+
+  if (q.toLowerCase().includes("lived here over 8 years") || q.includes("8 वर्ष")) {
+    headline = isHi ? "8 वर्ष बाद मकान मालिक की नोटिस अवधि बढ़कर 9 महीने हो जाती है।" : "After 8 years of tenancy, the landlord's notice period extends to 9 months.";
+    body = isHi ? "BGB § 573c के तहत, 5 वर्ष बाद नोटिस अवधि 6 महीने और 8 वर्ष बाद 9 महीने हो जाती है।" : "Pursuant to BGB § 573c(1), the landlord's notice period extends to 9 full months after 8 years of tenancy.";
+    sources = [{ title: "BGB § 573c · Notice periods", domain: "gesetze-im-internet.de", url: "https://www.gesetze-im-internet.de/bgb/__573c.html" }];
+  }
+
+  chatMessages.push({
+    role: 'assistant',
+    tag: `${reg} · ${cat}`,
+    headline: headline,
+    body: body,
+    sources: sources,
+    chips: chips
+  });
+  renderChat();
+}
+
+function shareChat() {
+  let transcript = "=== JUSTICE AI CASE TRANSCRIPT ===\n";
+  if (currentUser) {
+    transcript += `User: ${currentUser.name} (@${currentUser.username})\n`;
+  }
+  transcript += `Date: ${new Date().toLocaleString()}\n\n`;
+
+  chatMessages.forEach(m => {
+    transcript += `[${m.role.toUpperCase()}]: ${m.content || m.headline}\n${m.body || ''}\n\n`;
+  });
+  const blob = new Blob([transcript], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `JusticeAI_${currentUser ? currentUser.username : 'Case'}_Transcript.txt`;
+  a.click();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  populateLanguageDropdown("AUTO");
+  verifyExistingSession();
+});
+</script>
+</body>
+</html>

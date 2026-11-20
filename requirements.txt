@@ -1,0 +1,5 @@
+# Justice AI - Core Production Dependencies
+chromadb>=0.4.22
+python-docx>=1.1.0
+matplotlib>=3.8.0
+pypdf>=4.0.0

@@ -1,0 +1,3 @@
+"""
+LexGlobal AI Core Package
+"""

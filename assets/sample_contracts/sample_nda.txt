@@ -1,0 +1,18 @@
+ONE-WAY PROPRIETARY INFORMATION & NON-DISCLOSURE AGREEMENT
+
+This Non-Disclosure Agreement ("Agreement") is made between Disclosing Party and Receiving Party.
+
+1. CONFIDENTIAL INFORMATION
+Confidential Information includes all technical, business, financial, and strategic information disclosed by Disclosing Party, whether marked as confidential or not, including information obtained by observation.
+
+2. OBLIGATIONS OF RECEIVING PARTY
+Receiving Party agrees to hold all Confidential Information in strictest confidence in perpetuity (forever). Receiving Party shall not reverse engineer, decompile, or create derivative works.
+
+3. INDEMNITY AND INJUNCTIVE RELIEF
+Receiving Party acknowledges that any disclosure causes irreparable harm. Receiving Party shall indemnify, defend, and hold harmless Disclosing Party against any and all losses, including consequential damages, attorney fees, and punitive damages.
+
+4. GOVERNING LAW & FORUM SELECTION
+This Agreement is governed by the laws of England and Wales. The Receiving Party agrees that any claim must be brought exclusively before the courts of London, England, and Receiving Party irrevocably submits to such personal jurisdiction regardless of Receiving Party's geographic location.
+
+5. LIQUIDATED DAMAGES
+Any unauthorized disclosure by Receiving Party shall result in mandatory liquidated damages of $250,000 USD payable immediately upon demand without proof of actual loss.
