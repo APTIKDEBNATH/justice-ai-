@@ -234,4 +234,38 @@ def handle_api_request(method: str, path: str, headers: Any, post_data: str) -> 
             }
             return 200, response_headers, json.dumps(payload, ensure_ascii=False).encode("utf-8")
 
+        elif clean_path == "/api/contact":
+            email = body.get("email", "").strip()
+            query = body.get("query", "").strip()
+            if not email or not query:
+                return 400, response_headers, json.dumps({"status": "error", "message": "Email and query are required"}).encode("utf-8")
+
+            import time, uuid, os
+            ticket_id = f"TICKET-{uuid.uuid4().hex[:6].upper()}"
+            ticket_data = {
+                "ticket_id": ticket_id,
+                "email": email,
+                "query": query,
+                "timestamp": time.time()
+            }
+            try:
+                data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+                os.makedirs(data_dir, exist_ok=True)
+                tickets_file = os.path.join(data_dir, "tickets.json")
+                tickets = []
+                if os.path.exists(tickets_file):
+                    with open(tickets_file, "r", encoding="utf-8") as tf:
+                        tickets = json.load(tf)
+                tickets.append(ticket_data)
+                with open(tickets_file, "w", encoding="utf-8") as tf:
+                    json.dump(tickets, tf, indent=2)
+            except Exception as e:
+                print(f"[api_handler] Error saving ticket: {e}")
+
+            return 200, response_headers, json.dumps({
+                "status": "success",
+                "ticket_id": ticket_id,
+                "message": "Your ticket has been submitted successfully."
+            }).encode("utf-8")
+
     return 404, response_headers, json.dumps({"status": "error", "message": "Not found"}).encode("utf-8")

@@ -129,7 +129,7 @@ def upload_to_github(token, repo_owner, repo_name, branch="main", base_dir="."):
 
     # 5. Create Commit
     commit_body = {
-        "message": "Release v1.0: Justice AI Multi-Jurisdiction Legal Intelligence Platform\n\n- Full legal intelligence engine with ChromaDB statutory grounding\n- Academic Project Synopsis Report (17-page PDF & Word .docx)\n- SIH Presentation slides and high-DPI charts\n- Responsive web UI and cloud production server (app.py)\n- Mentor: Alan Alexander | Team: Aptik Debnath, Himanshu Ganwani, Sudhanshu Mishra, Rachit Solanki",
+        "message": "Release v1.1: Oswald typography, unified 3 coverage cards, 6 randomized sample scenarios, and UI refinements\n\n- Unified Indian legal statutes into a single card (reduced to 3 coverage boxes)\n- Added 6 dynamic randomized sample scenarios with zero place or person names\n- Renamed Statutory Coverage to Coverage\n- Modernized all typography to Oswald across landing page and consultation chat\n- Updated all branding to all-caps JUSTICE AI\n- Minimalist identical sidebar collapse arrows and white/blue dropdown selectors\n- Integrated Contact Us support ticket modal with /api/contact backend",
         "tree": tree_sha
     }
     if parent_commit:

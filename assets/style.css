@@ -1,9 +1,9 @@
-/* Justice AI - Executive Global Legal Intelligence Theme
-   Warm Editorial Aesthetic with Newsreader Serif & Inter / Devanagari Typography
+/* JUSTICE AI - Executive Global Legal Intelligence Theme
+   Modern Editorial Aesthetic with Oswald & Devanagari Typography
    Supports Seamless Light / Dark Theme Switching & Clean SVG Favicon Styling
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
 
 /* Default Light Theme Variables (Warm Paper & Editorial Stone) */
 :root {
@@ -48,7 +48,7 @@
 html, body, [data-testid="stAppViewContainer"], .stApp {
   background-color: var(--bg-main) !important;
   color: var(--text-primary) !important;
-  font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: 'Oswald', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
@@ -81,7 +81,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 
 /* Brand & Typography */
 .justice-brand {
-  font-family: 'Newsreader', 'Noto Serif Devanagari', Georgia, serif;
+  font-family: 'Oswald', 'Noto Sans Devanagari', sans-serif;
   font-size: 28px;
   font-weight: 600;
   color: var(--text-primary);
@@ -118,7 +118,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 }
 
 .headline-serif {
-  font-family: 'Newsreader', 'Noto Serif Devanagari', Georgia, serif;
+  font-family: 'Oswald', 'Noto Sans Devanagari', sans-serif;
   font-size: 22px;
   font-weight: 500;
   line-height: 1.35;
@@ -648,7 +648,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Oswald', -apple-system, BlinkMacSystemFont, sans-serif;
   scroll-behavior: smooth;
 }
 
@@ -733,7 +733,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .hero-catchphrase {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: 'Oswald', sans-serif;
   font-size: clamp(38px, 6vw, 62px);
   font-weight: 600;
   line-height: 1.15;
@@ -816,7 +816,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .section-title {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 34px;
   font-weight: 600;
   color: var(--text-primary);
@@ -834,7 +834,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 /* Jurisdiction / Statute Cards Grid */
 .jurisdiction-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -863,7 +863,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .statute-title {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
@@ -924,7 +924,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .feature-card h3 {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: var(--text-primary);
@@ -941,7 +941,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 /* Scenarios / Test Cases Grid */
 .scenarios-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
@@ -1038,5 +1038,5 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
   .landing-hero { padding: 48px 16px 40px; }
   .hero-subtext { font-size: 16px; }
   .landing-section { padding: 48px 16px; }
-  .features-grid, .scenarios-grid { grid-template-columns: 1fr; }
+  .jurisdiction-grid, .features-grid, .scenarios-grid { grid-template-columns: 1fr !important; }
 }
