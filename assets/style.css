@@ -1,9 +1,9 @@
 /* JUSTICE AI - Executive Global Legal Intelligence Theme
-   Modern Editorial Aesthetic with Oswald & Devanagari Typography
+   Warm Editorial Aesthetic with Newsreader Serif & Inter / Devanagari Typography
    Supports Seamless Light / Dark Theme Switching & Clean SVG Favicon Styling
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap');
 
 /* Default Light Theme Variables (Warm Paper & Editorial Stone) */
 :root {
@@ -48,7 +48,7 @@
 html, body, [data-testid="stAppViewContainer"], .stApp {
   background-color: var(--bg-main) !important;
   color: var(--text-primary) !important;
-  font-family: 'Oswald', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
@@ -81,7 +81,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 
 /* Brand & Typography */
 .justice-brand {
-  font-family: 'Oswald', 'Noto Sans Devanagari', sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 28px;
   font-weight: 600;
   color: var(--text-primary);
@@ -118,7 +118,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 }
 
 .headline-serif {
-  font-family: 'Oswald', 'Noto Sans Devanagari', sans-serif;
+  font-family: 'Newsreader', 'Noto Serif Devanagari', Georgia, serif;
   font-size: 22px;
   font-weight: 500;
   line-height: 1.35;
@@ -648,7 +648,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  font-family: 'Oswald', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   scroll-behavior: smooth;
 }
 
@@ -733,7 +733,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .hero-catchphrase {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Newsreader', Georgia, serif;
   font-size: clamp(38px, 6vw, 62px);
   font-weight: 600;
   line-height: 1.15;
@@ -816,7 +816,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .section-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Newsreader', Georgia, serif;
   font-size: 34px;
   font-weight: 600;
   color: var(--text-primary);
@@ -863,7 +863,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .statute-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Newsreader', Georgia, serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
@@ -924,7 +924,7 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 .feature-card h3 {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: var(--text-primary);
@@ -1034,9 +1034,44 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
 }
 
 @media(max-width: 768px) {
+  .landing-nav {
+    padding: 10px 14px !important;
+  }
+  .landing-nav-inner {
+    gap: 6px !important;
+  }
+  .landing-brand {
+    flex-shrink: 0 !important;
+  }
   .landing-nav-links { display: none; }
-  .landing-hero { padding: 48px 16px 40px; }
-  .hero-subtext { font-size: 16px; }
-  .landing-section { padding: 48px 16px; }
+  .landing-brand span, .justice-brand, #brandTitle {
+    font-family: 'Oswald', sans-serif !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+  }
+  .landing-nav-actions {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+  .landing-nav-actions .pill {
+    padding: 0 10px !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+  }
+  .landing-nav-actions .theme-toggle-btn {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    padding: 0 !important;
+  }
+  .landing-hero { padding: 40px 16px 36px; }
+  .hero-subtext { font-size: 15px; }
+  .landing-section { padding: 40px 16px; }
   .jurisdiction-grid, .features-grid, .scenarios-grid { grid-template-columns: 1fr !important; }
 }
