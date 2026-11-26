@@ -340,7 +340,7 @@ li[role="option"] {
 
 li[role="option"]:hover, li[aria-selected="true"] {
   background-color: var(--bg-sidebar) !important;
-  color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 div[data-testid="stSelectbox"] label, div[data-testid="stSelectbox"] label p {
@@ -1074,4 +1074,259 @@ div[data-testid="column"] button:has(p:contains("🌙")):hover {
   .hero-subtext { font-size: 15px; }
   .landing-section { padding: 40px 16px; }
   .jurisdiction-grid, .features-grid, .scenarios-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ==========================================================================
+   ANTIGRAVITY COMPOSER LOADOUT STYLING
+   ========================================================================== */
+.antigravity-composer-box {
+  max-width: 768px;
+  margin: 0 auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 18px;
+  padding: 12px 14px 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+body.dark-theme .antigravity-composer-box {
+  background: #111215 !important;
+  border-color: #24262c !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+.antigravity-composer-box:focus-within {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 4px 24px rgba(37, 99, 235, 0.15) !important;
+}
+
+.composer-attachments-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-light);
+}
+
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 4px 8px 4px 6px;
+  font-size: 12px;
+  color: var(--text-primary);
+  max-width: 220px;
+  user-select: none;
+}
+
+.attachment-chip img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.attachment-chip-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.attachment-chip-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.attachment-chip-remove {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0 2px;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.attachment-chip-remove:hover {
+  color: #ef4444;
+}
+
+.composer-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14.5px;
+  line-height: 1.5;
+  outline: none;
+  resize: none;
+  min-height: 24px;
+  max-height: 140px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.composer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+  user-select: none;
+}
+
+.composer-toolbar-left,
+.composer-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.composer-tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.composer-tool-btn:hover {
+  background: var(--border-light);
+  color: var(--text-primary);
+}
+
+.antigravity-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.antigravity-pill:hover {
+  background: var(--border-light);
+  color: var(--text-primary);
+}
+
+.composer-grounding-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.grounding-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.btn-mic.recording {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #ef4444 !important;
+  animation: pulse-recording 1.4s infinite ease-in-out;
+}
+
+.antigravity-submit-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #1F4E79 !important;
+  color: #ffffff !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(31, 78, 121, 0.25);
+}
+
+body.dark-theme .antigravity-submit-circle,
+body:not(.dark-theme) .antigravity-submit-circle {
+  background: #1F4E79 !important;
+  color: #ffffff !important;
+}
+
+.action-btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn-pill:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.action-btn-pill.speaking {
+  background: rgba(37, 99, 235, 0.1) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  animation: pulse-speaking 1.2s infinite ease-in-out;
+}
+
+@media(max-width: 400px) {
+  .antigravity-pill span {
+    max-width: 95px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .composer-grounding-pill span:not(.grounding-dot) {
+    display: none;
+  }
+  .composer-toolbar-left, .composer-toolbar-right {
+    gap: 4px !important;
+  }
 }

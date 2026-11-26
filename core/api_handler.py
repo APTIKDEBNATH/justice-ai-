@@ -11,7 +11,7 @@ from typing import Tuple, Dict, Any, Optional
 from core.auth_db import (
     register_user, authenticate_user, get_user_by_token, delete_session,
     get_user_conversations, create_conversation, get_conversation_details,
-    save_chat_turn, delete_conversation
+    save_chat_turn, delete_conversation, save_shared_chat, get_shared_chat
 )
 from core.autonomous_reasoner import reason_legally
 from core.legal_formatter import LEGAL_CATEGORIES, CLEAN_REGIONS, REGION_LANGUAGES
@@ -96,6 +96,15 @@ def handle_api_request(method: str, path: str, headers: Any, post_data: str) -> 
                 return 404, response_headers, json.dumps({"status": "error", "message": "Conversation not found"}).encode("utf-8")
 
             return 200, response_headers, json.dumps({"status": "success", "data": details}).encode("utf-8")
+
+        elif clean_path == "/api/share":
+            share_id = query_params.get("id", [None])[0]
+            if not share_id:
+                return 400, response_headers, json.dumps({"status": "error", "message": "Missing share id"}).encode("utf-8")
+            shared = get_shared_chat(share_id)
+            if not shared:
+                return 404, response_headers, json.dumps({"status": "error", "message": "Shared chat not found"}).encode("utf-8")
+            return 200, response_headers, json.dumps({"status": "success", "data": shared}, ensure_ascii=False).encode("utf-8")
 
     # ---------------- POST ENDPOINTS ----------------
     elif method == "POST":
@@ -200,12 +209,49 @@ def handle_api_request(method: str, path: str, headers: Any, post_data: str) -> 
             category = body.get("category", "General")
             language = body.get("language", "en")
             conv_id = body.get("conversation_id")
+            history = body.get("history", [])
+            attachments = body.get("attachments", [])
 
-            if not query:
-                return 400, response_headers, json.dumps({"status": "error", "message": "Query cannot be empty"}).encode("utf-8")
+            # Extract text from any attached documents (PDFs, images, or text)
+            doc_context_parts = []
+            for att in attachments:
+                att_name = att.get("name", "document")
+                att_type = att.get("type", "").lower()
+                att_data = att.get("data", "")
+                extracted = att.get("extracted_text", "").strip()
+
+                if not extracted and att_data and ("pdf" in att_type or att_name.endswith(".pdf")):
+                    try:
+                        import base64, io
+                        from pypdf import PdfReader
+                        raw_b64 = att_data.split(",")[-1]
+                        pdf_bytes = base64.b64decode(raw_b64)
+                        reader = PdfReader(io.BytesIO(pdf_bytes))
+                        pages_text = [p.extract_text() or "" for p in reader.pages[:10]]
+                        pdf_text = "\n".join(pages_text).strip()
+                        if pdf_text:
+                            extracted = pdf_text
+                            att["extracted_text"] = pdf_text
+                    except Exception as e:
+                        print(f"[api_handler] PDF extract error for {att_name}: {e}")
+
+                if extracted:
+                    doc_context_parts.append(f"--- Document: {att_name} ---\n{extracted[:4000]}")
+
+            # Synthesize full query with document context if present
+            full_query = query
+            if doc_context_parts:
+                docs_block = "\n\n".join(doc_context_parts)
+                if full_query:
+                    full_query = f"{full_query}\n\n[USER ATTACHED LEGAL DOCUMENT CONTEXT]:\n{docs_block}"
+                else:
+                    full_query = f"Analyze the following legal document, cite applicable statutes, and explain rights:\n\n{docs_block}"
+
+            if not full_query:
+                return 400, response_headers, json.dumps({"status": "error", "message": "Query or document attachment required"}).encode("utf-8")
 
             # Process with Autonomous Legal Reasoning Agent & ChromaDB Vector Search
-            reasoning_result = reason_legally(query, jurisdiction, category, language)
+            reasoning_result = reason_legally(full_query, jurisdiction, category, language, history=history)
             eff_jur = reasoning_result["jurisdiction"]
             eff_cat = reasoning_result["category"]
             eff_lang = reasoning_result["language"]
@@ -214,10 +260,10 @@ def handle_api_request(method: str, path: str, headers: Any, post_data: str) -> 
             # If user is authenticated, persist to database under their account
             if user:
                 if not conv_id:
-                    new_c = create_conversation(user["id"], query[:35], jurisdiction, category)
+                    new_c = create_conversation(user["id"], query[:35] if query else "Document Consultation", jurisdiction, category)
                     conv_id = new_c["id"]
                 try:
-                    save_chat_turn(user["id"], conv_id, query, card["body_text"], card, eff_jur, eff_cat)
+                    save_chat_turn(user["id"], conv_id, query or "[Document Attached]", card["body_text"], card, eff_jur, eff_cat)
                 except Exception as e:
                     print(f"[api_handler] Error saving turn: {e}")
             else:
@@ -230,7 +276,8 @@ def handle_api_request(method: str, path: str, headers: Any, post_data: str) -> 
                 "jurisdiction": eff_jur,
                 "category": eff_cat,
                 "language": eff_lang,
-                "card": card
+                "card": card,
+                "attachments": [{"name": a.get("name"), "type": a.get("type"), "size": a.get("size")} for a in attachments]
             }
             return 200, response_headers, json.dumps(payload, ensure_ascii=False).encode("utf-8")
 
@@ -267,5 +314,18 @@ def handle_api_request(method: str, path: str, headers: Any, post_data: str) -> 
                 "ticket_id": ticket_id,
                 "message": "Your ticket has been submitted successfully."
             }).encode("utf-8")
+
+        elif clean_path == "/api/share":
+            messages = body.get("messages", [])
+            if not messages:
+                return 400, response_headers, json.dumps({"status": "error", "message": "No conversation to share"}).encode("utf-8")
+            share_id = save_shared_chat({
+                "title": body.get("title", "Shared Legal Consultation"),
+                "jurisdiction": body.get("jurisdiction", "AUTO"),
+                "category": body.get("category", "General"),
+                "language": body.get("language", "en"),
+                "messages": messages
+            })
+            return 200, response_headers, json.dumps({"status": "success", "share_id": share_id}).encode("utf-8")
 
     return 404, response_headers, json.dumps({"status": "error", "message": "Not found"}).encode("utf-8")

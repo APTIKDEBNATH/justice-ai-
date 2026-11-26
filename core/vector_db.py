@@ -193,6 +193,184 @@ VECTOR_STATUTES = [
         "source_domain": "law.cornell.edu",
         "source_url": "https://www.law.cornell.edu/uscode/text/29/207",
         "tags": "flsa 29 usc 207 overtime 1.5x 40 hours wage theft unpaid compensation employment"
+    },
+
+    # ---------------- SWITZERLAND: CODE OF OBLIGATIONS (TENANCY & EMPLOYMENT) ----------------
+    {
+        "id": "ch_co_266c_tenancy",
+        "jurisdiction": "CH",
+        "category": "Tenancy: Eviction & Termination Notice",
+        "act": "Swiss Code of Obligations (SR 220)",
+        "section": "Art. 266c, 266d & 266l",
+        "title": "Residential & Commercial Lease Notice Periods and Official Form Requirement",
+        "summary": "Under Art. 266c of the Swiss Code of Obligations (OR/CO), residential tenancies require at least 3 months' notice (Art. 266d sets 6 months for commercial premises). Under Art. 266l, notice of termination by the landlord must be given in writing using an official form approved by the canton; for family homes, separate notices must be served on both spouses (Art. 266n), otherwise the termination is void (Art. 266o).",
+        "source_domain": "fedlex.admin.ch",
+        "source_url": "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en#art_266c",
+        "tags": "switzerland swiss eviction notice landlord termination lease 3 months official cantonal form art 266c 266l"
+    },
+    {
+        "id": "ch_co_271_challenge",
+        "jurisdiction": "CH",
+        "category": "Tenancy: Eviction & Termination Notice",
+        "act": "Swiss Code of Obligations (SR 220)",
+        "section": "Art. 271 & Art. 273",
+        "title": "Challenging Unfair Lease Termination before the Conciliation Authority (30 Days)",
+        "summary": "Under Art. 271 and Art. 273 CO, a tenant may challenge a notice of termination that contravenes good faith—or request a lease extension under Art. 272—by filing with the local conciliation authority (Schlichtungsbehörde / autorité de conciliation) within 30 days of receiving the notice.",
+        "source_domain": "fedlex.admin.ch",
+        "source_url": "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en#art_271",
+        "tags": "switzerland swiss contest challenge termination 30 days conciliation authority schlichtungsbehoerde art 271 273"
+    },
+    {
+        "id": "ch_co_335c_employment",
+        "jurisdiction": "CH",
+        "category": "Employment & Wage Rights",
+        "act": "Swiss Code of Obligations (SR 220)",
+        "section": "Art. 335c",
+        "title": "Notice Periods for Termination of Employment Contracts",
+        "summary": "Under Art. 335c CO, an employment relationship may be terminated at the end of a month by giving 1 month's notice in the first year of service, 2 months from the second to ninth year, and 3 months thereafter.",
+        "source_domain": "fedlex.admin.ch",
+        "source_url": "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en#art_335c",
+        "tags": "switzerland swiss employment termination notice period salary art 335c"
+    },
+
+    # ---------------- UNITED KINGDOM: TENANCY, CONSUMER, EMPLOYMENT, PRIVACY ----------------
+    {
+        "id": "gb_housing_1988",
+        "jurisdiction": "GB",
+        "category": "Tenancy: Eviction & Termination Notice",
+        "act": "Housing Act 1988",
+        "section": "Section 8 & Part I",
+        "title": "Statutory Grounds & Notice Requirements for Residential Possession",
+        "summary": "Under the Housing Act 1988 (as amended), residential landlords must serve valid statutory written notice specifying recognized legal grounds and notice periods and obtain a court possession order before eviction.",
+        "source_domain": "legislation.gov.uk",
+        "source_url": "https://www.legislation.gov.uk/ukpga/1988/50/contents",
+        "tags": "uk united kingdom england landlord eviction notice housing act 1988 possession"
+    },
+    {
+        "id": "gb_cra_2015",
+        "jurisdiction": "GB",
+        "category": "Consumer Protection & Defective Goods",
+        "act": "Consumer Rights Act 2015",
+        "section": "Sections 9, 19–24",
+        "title": "Goods of Satisfactory Quality, 30-Day Right to Reject & Refund Remedies",
+        "summary": "Under the Consumer Rights Act 2015, goods must be of satisfactory quality, fit for purpose, and as described. Consumers have a 30-day short-term right to reject faulty goods for a full refund, or demand repair/replacement.",
+        "source_domain": "legislation.gov.uk",
+        "source_url": "https://www.legislation.gov.uk/ukpga/2015/15/contents",
+        "tags": "uk united kingdom consumer rights act 2015 defective goods refund repair replacement"
+    },
+    {
+        "id": "gb_era_1996",
+        "jurisdiction": "GB",
+        "category": "Employment & Wage Rights",
+        "act": "Employment Rights Act 1996",
+        "section": "Sections 86 & 94",
+        "title": "Minimum Notice Periods and Right Not to Be Unfairly Dismissed",
+        "summary": "The Employment Rights Act 1996 establishes statutory minimum notice periods for termination, protection against unfair dismissal, itemized pay statements, and unlawful deduction remedies.",
+        "source_domain": "legislation.gov.uk",
+        "source_url": "https://www.legislation.gov.uk/ukpga/1996/18/contents",
+        "tags": "uk united kingdom employment unfair dismissal wages notice period"
+    },
+    {
+        "id": "gb_dpa_2018",
+        "jurisdiction": "GB",
+        "category": "Data Privacy & GDPR",
+        "act": "Data Protection Act 2018 (UK GDPR)",
+        "section": "Part 2 & Chapter 3",
+        "title": "Data Subject Access, Rectification & Erasure Rights",
+        "summary": "The UK Data Protection Act 2018 alongside UK GDPR provides enforceable rights to access personal data, demand erasure, and complain to the Information Commissioner's Office (ICO).",
+        "source_domain": "legislation.gov.uk",
+        "source_url": "https://www.legislation.gov.uk/ukpga/2018/12/contents",
+        "tags": "uk united kingdom privacy gdpr data protection erasure ico"
+    },
+
+    # ---------------- CANADA: LABOUR & PRIVACY ----------------
+    {
+        "id": "ca_clc_employment",
+        "jurisdiction": "CA",
+        "category": "Employment & Wage Rights",
+        "act": "Canada Labour Code (R.S.C., 1985, c. L-2)",
+        "section": "Part III (Divisions IX–XI)",
+        "title": "Termination Notice, Severance Pay & Unjust Dismissal Protections",
+        "summary": "Part III of the Canada Labour Code sets statutory standards for minimum notice of termination, severance pay, hours of work, overtime, and unjust dismissal complaints in federally regulated workplaces.",
+        "source_domain": "laws-lois.justice.gc.ca",
+        "source_url": "https://laws-lois.justice.gc.ca/eng/acts/L-2/",
+        "tags": "canada labour code employment overtime wages termination severance"
+    },
+    {
+        "id": "ca_pipeda_privacy",
+        "jurisdiction": "CA",
+        "category": "Data Privacy & GDPR",
+        "act": "Personal Information Protection and Electronic Documents Act (PIPEDA)",
+        "section": "Schedule 1 (Fair Information Principles)",
+        "title": "Consent, Access, and Commercial Data Privacy Protections",
+        "summary": "PIPEDA requires private-sector organizations in Canada to obtain meaningful consent, protect personal information with safeguards, report security breaches, and honor consumer access/correction requests.",
+        "source_domain": "laws-lois.justice.gc.ca",
+        "source_url": "https://laws-lois.justice.gc.ca/eng/acts/P-8.6/",
+        "tags": "canada privacy personal information pipeda data breach delete access"
+    },
+
+    # ---------------- AUSTRALIA: CONSUMER & WORKPLACE ----------------
+    {
+        "id": "au_acl_2010",
+        "jurisdiction": "AU",
+        "category": "Consumer Protection & Defective Goods",
+        "act": "Competition and Consumer Act 2010 (Australian Consumer Law)",
+        "section": "Schedule 2 · Consumer Guarantees",
+        "title": "Acceptable Quality Guarantees & Remedies for Major Failures",
+        "summary": "Under Schedule 2 (Australian Consumer Law), consumers are entitled to automatic statutory guarantees that goods are of acceptable quality; for major failures, consumers may choose a full refund or replacement.",
+        "source_domain": "legislation.gov.au",
+        "source_url": "https://www.legislation.gov.au/C2004A00109/latest/text",
+        "tags": "australia acl consumer guarantee refund defective product replacement"
+    },
+    {
+        "id": "au_fwa_2009",
+        "jurisdiction": "AU",
+        "category": "Employment & Wage Rights",
+        "act": "Fair Work Act 2009",
+        "section": "Part 2-2 (National Employment Standards)",
+        "title": "Minimum Notice, Maximum Weekly Hours & Unfair Dismissal Remedies",
+        "summary": "The Fair Work Act 2009 establishes the National Employment Standards (NES), minimum termination notice periods, overtime/award protections, and unfair dismissal applications via the Fair Work Commission.",
+        "source_domain": "legislation.gov.au",
+        "source_url": "https://www.legislation.gov.au/C2009A00028/latest/text",
+        "tags": "australia fair work act employment wages dismissal notice"
+    },
+
+    # ---------------- SINGAPORE: EMPLOYMENT, CONSUMER & HARASSMENT ----------------
+    {
+        "id": "sg_ea_1968",
+        "jurisdiction": "SG",
+        "category": "Employment & Wage Rights",
+        "act": "Employment Act 1968 (Singapore)",
+        "section": "Parts II–IV",
+        "title": "Statutory Salary Payment, Notice of Termination & Overtime Rights",
+        "summary": "Singapore's Employment Act 1968 governs basic terms of employment, timely salary payment, termination notice requirements, leave entitlements, and rest/overtime rules.",
+        "source_domain": "sso.agc.gov.sg",
+        "source_url": "https://sso.agc.gov.sg/Act/EmA1968",
+        "tags": "singapore employment act salary wages termination notice overtime"
+    },
+    {
+        "id": "sg_cpfta_2003",
+        "jurisdiction": "SG",
+        "category": "Consumer Protection & Defective Goods",
+        "act": "Consumer Protection (Fair Trading) Act 2003",
+        "section": "Part 2 & Part 3 (Lemon Law)",
+        "title": "Protection Against Unfair Practices & Defective Goods Remedies",
+        "summary": "Singapore's CPFTA protects consumers against unfair trading practices and misleading claims, and provides statutory 'Lemon Law' remedies (repair, replacement, price reduction, or refund) for defective goods.",
+        "source_domain": "sso.agc.gov.sg",
+        "source_url": "https://sso.agc.gov.sg/Act/CPFTA2003",
+        "tags": "singapore consumer protection defective goods refund lemon law cpfta"
+    },
+    {
+        "id": "sg_poha_2014",
+        "jurisdiction": "SG",
+        "category": "Criminal & Penal Law",
+        "act": "Protection from Harassment Act 2014",
+        "section": "Sections 3–13",
+        "title": "Protection Orders and Civil/Criminal Remedies Against Harassment & Stalking",
+        "summary": "The Protection from Harassment Act 2014 prohibits threatening, abusive, or insulting communication (including online) and enables expedited protection orders and damages.",
+        "source_domain": "sso.agc.gov.sg",
+        "source_url": "https://sso.agc.gov.sg/Act/PHA2014",
+        "tags": "singapore harassment stalking online abuse protection order"
     }
 ]
 
@@ -237,33 +415,43 @@ def query_vector_db(query: str, jurisdiction: str = "AUTO", category: str = "AUT
     Executes semantic vector search using cosine distance over statutory embeddings.
     """
     col = get_vector_db()
-    
+    jur_norm = "GB" if jurisdiction == "UK" else jurisdiction
+
     where_filter = None
-    if jurisdiction not in ("AUTO", "GLOBAL") and category not in ("AUTO", "General"):
-        where_filter = {"$and": [{"jurisdiction": jurisdiction}, {"category": category}]}
-    elif jurisdiction not in ("AUTO", "GLOBAL"):
-        where_filter = {"jurisdiction": jurisdiction}
+    if jur_norm not in ("AUTO", "GLOBAL") and category not in ("AUTO", "General"):
+        where_filter = {"$and": [{"jurisdiction": jur_norm}, {"category": category}]}
+    elif jur_norm not in ("AUTO", "GLOBAL"):
+        where_filter = {"jurisdiction": jur_norm}
     elif category not in ("AUTO", "General"):
         where_filter = {"category": category}
 
-    try:
-        results = col.query(
-            query_texts=[query],
-            n_results=top_k,
-            where=where_filter
-        )
-    except Exception as e:
-        # If strict filter returned 0, retry without where filter
-        results = col.query(
-            query_texts=[query],
-            n_results=top_k
-        )
+    def _run_query(wf):
+        res = col.query(query_texts=[query], n_results=top_k, where=wf)
+        out = []
+        if res and "metadatas" in res and res["metadatas"]:
+            for meta_list in res["metadatas"]:
+                for m in meta_list:
+                    out.append(dict(m))
+        return out
 
-    matched_statutes = []
-    if results and "metadatas" in results and results["metadatas"]:
-        for meta_list in results["metadatas"]:
-            for m in meta_list:
-                matched_statutes.append(dict(m))
+    try:
+        matched_statutes = _run_query(where_filter)
+    except Exception:
+        matched_statutes = []
+
+    # If strict (jurisdiction + category) yielded nothing, broaden within the same jurisdiction first
+    if not matched_statutes and jur_norm not in ("AUTO", "GLOBAL"):
+        try:
+            matched_statutes = _run_query({"jurisdiction": jur_norm})
+        except Exception:
+            matched_statutes = []
+
+    # Only fall back to global semantic search when jurisdiction is AUTO or GLOBAL
+    if not matched_statutes and jur_norm in ("AUTO", "GLOBAL"):
+        try:
+            matched_statutes = _run_query(None)
+        except Exception:
+            matched_statutes = []
 
     return matched_statutes
 

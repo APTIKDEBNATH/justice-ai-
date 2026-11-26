@@ -472,46 +472,131 @@ def format_assistant_response_data(
     if not headline:
         headline = "Statutory Legal Assessment"
 
-    # Clean body text
+    # Clean body text & extract any trailing ### Official Sources links into structured source pills
     body_text = clean_text
     body_text = re.sub(r'⚖️\s*\*\*LEGAL DISCLAIMER\*\*[\s\S]*$', '', body_text).strip()
-    body_text = re.sub(r'^(?:###|\*\*|📌)[^\n]+\n+', '', body_text).strip()
 
-    # Sources
+    llm_sources = []
+    src_block_match = re.search(
+        r'(?:^|\n)#{1,4}\s*(?:Official\s+)?Sources?\s*:?\s*\n([\s\S]*?)(?=\n#{1,4}\s|\Z)',
+        body_text,
+        flags=re.IGNORECASE,
+    )
+    if src_block_match:
+        src_block_text = src_block_match.group(1)
+        for m in re.finditer(r'\[([^\]]+)\]\((https?://[^\s)]+)\)', src_block_text):
+            link_title = m.group(1).strip()
+            link_url = m.group(2).strip().rstrip('.,;')
+            domain_match = re.match(r'https?://(?:www\.)?([^/]+)', link_url, flags=re.IGNORECASE)
+            link_domain = domain_match.group(1) if domain_match else "official-statute"
+            llm_sources.append({
+                "title": link_title,
+                "domain": link_domain,
+                "url": link_url,
+            })
+        body_text = (body_text[:src_block_match.start()] + body_text[src_block_match.end():]).strip()
+
+    body_text = re.sub(r'^\s*[-*_]{3,}\s*$', '', body_text, flags=re.MULTILINE).strip()
+    if headline and first_lines:
+        first_stripped = re.sub(r'[*_#\s`]+', ' ', first_lines[0]).strip().lower()
+        hl_stripped = re.sub(r'[*_#\s`]+', ' ', headline).strip().lower()
+        if first_stripped == hl_stripped or hl_stripped in first_stripped:
+            body_text = "\n".join(body_text.split("\n")[1:]).strip()
+            body_text = re.sub(r'^\s*[-*_]{3,}\s*$', '', body_text, flags=re.MULTILINE).strip()
+    body_text = re.sub(r'^(?:###|\*\*|📌)\s*(?:short answer|headline)\s*:?\s*\n+', '', body_text, flags=re.IGNORECASE).strip()
+
+    # Sources: Combine LLM-cited official links and retrieved ChromaDB statutes (filtered by jurisdiction)
+    jur_norm = "GB" if jurisdiction == "UK" else jurisdiction
     sources = []
-    for s in retrieved_statutes:
-        title = s.get("title_hi") if lang == "hi" and "title_hi" in s else f"{s['act']} · {s['section']} · {s['title']}"
+    seen_urls = set()
+
+    def _add_source(title: str, domain: str, url: str):
+        if not url or not url.startswith("http"):
+            return
+        key = (url.lower(), title.lower())
+        if key in seen_urls or any(u == url.lower() for u, _ in seen_urls):
+            return
+        seen_urls.add(key)
         sources.append({
             "title": title,
-            "domain": s.get("source_domain", "official-gazette.gov"),
-            "url": s.get("source_url", "#")
+            "domain": domain,
+            "url": url,
         })
 
+    for ls in llm_sources:
+        _add_source(ls["title"], ls["domain"], ls["url"])
+
+    dom_specific = (legal_domain or "") not in ("", "AUTO", "General", "General Legal Advisory")
+    for s in retrieved_statutes:
+        s_jur = "GB" if s.get("jurisdiction") == "UK" else s.get("jurisdiction")
+        if jur_norm not in ("AUTO", "GLOBAL") and s_jur and s_jur != jur_norm:
+            continue
+        s_cat = s.get("category", "")
+        if dom_specific and s_cat and s_cat.lower() != legal_domain.lower():
+            continue
+        title = s.get("title_hi") if lang == "hi" and "title_hi" in s else f"{s['act']} · {s['section']} · {s['title']}"
+        _add_source(title, s.get("source_domain", "official-gazette.gov"), s.get("source_url", ""))
+
+    # Jurisdictional & category canonical official portal fallback so every response has direct source links
     if not sources:
-        if jurisdiction == "DE":
-            sources = [
-                {"title": "BGB § 573 · Ordinary termination by the landlord", "domain": "gesetze-im-internet.de", "url": "https://www.gesetze-im-internet.de/bgb/__573.html"},
-                {"title": "BGB § 573c · Notice periods", "domain": "gesetze-im-internet.de", "url": "https://www.gesetze-im-internet.de/bgb/__573c.html"}
-            ]
-        elif jurisdiction == "IN":
-            sources = [
-                {"title": "उपभोक्ता संरक्षण अधिनियम, 2019 · धारा 39 · ज़िला आयोग के आदेश" if lang == "hi" else "Consumer Protection Act, 2019 · Section 39 · Orders of District Commission", "domain": "indiacode.nic.in", "url": "https://www.indiacode.nic.in/handle/123456789/15256"},
-                {"title": "उपभोक्ता संरक्षण अधिनियम, 2019 · धारा 69 · शिकायत की समय-सीमा" if lang == "hi" else "Consumer Protection Act, 2019 · Section 69 · Limitation Period", "domain": "indiacode.nic.in", "url": "https://www.indiacode.nic.in/handle/123456789/15256"}
-            ]
-        elif jurisdiction == "EU":
-            sources = [
-                {"title": "GDPR Article 17 · Right to erasure ('Right to be forgotten')", "domain": "eur-lex.europa.eu", "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"},
-                {"title": "GDPR Article 82 · Right to compensation and liability", "domain": "eur-lex.europa.eu", "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"}
-            ]
-        elif jurisdiction == "US":
-            sources = [
-                {"title": "Fair Labor Standards Act · 29 U.S.C. § 207 · Maximum Hours & Overtime", "domain": "law.cornell.edu", "url": "https://www.law.cornell.edu/uscode/text/29/207"},
-                {"title": "Texas Property Code § 24.005 · Notice to Vacate", "domain": "statutes.capitol.texas.gov", "url": "https://statutes.capitol.texas.gov/Docs/PR/htm/PR.24.htm"}
-            ]
-        elif jurisdiction == "UK":
-            sources = [
-                {"title": "Consumer Rights Act 2015 · Section 9 & 20 · Goods to be of Satisfactory Quality", "domain": "legislation.gov.uk", "url": "https://www.legislation.gov.uk/ukpga/2015/15/contents"}
-            ]
+        dom_low = (legal_domain or "").lower()
+        if jur_norm == "CH":
+            if "employ" in dom_low or "wage" in dom_low:
+                _add_source("Swiss Code of Obligations (SR 220) · Art. 335c (Employment Notice)", "fedlex.admin.ch", "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en#art_335c")
+            else:
+                _add_source("Swiss Code of Obligations (SR 220) · Art. 266c–266l (Tenancy Notice)", "fedlex.admin.ch", "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en#art_266c")
+                _add_source("Swiss Code of Obligations (SR 220) · Art. 271 & 273 (Challenging Termination)", "fedlex.admin.ch", "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en#art_271")
+        elif jur_norm == "DE":
+            _add_source("BGB § 573 · Ordinary termination by the landlord", "gesetze-im-internet.de", "https://www.gesetze-im-internet.de/bgb/__573.html")
+            _add_source("BGB § 573c · Notice periods", "gesetze-im-internet.de", "https://www.gesetze-im-internet.de/bgb/__573c.html")
+        elif jur_norm == "IN":
+            if "traffic" in dom_low or "motor" in dom_low:
+                _add_source("Motor Vehicles Act, 1988 · Virtual Court & Contest Portal", "vcourts.gov.in", "https://vcourts.gov.in")
+                _add_source("Parivahan e-Challan & Rule 139 Verification", "echallan.parivahan.gov.in", "https://echallan.parivahan.gov.in")
+            elif "criminal" in dom_low or "penal" in dom_low:
+                _add_source("Bharatiya Nyaya Sanhita, 2023 (BNS)", "indiacode.nic.in", "https://www.indiacode.nic.in/handle/123456789/20340")
+                _add_source("Bharatiya Nagarik Suraksha Sanhita, 2023 (BNSS)", "indiacode.nic.in", "https://www.indiacode.nic.in/handle/123456789/20341")
+            else:
+                _add_source("उपभोक्ता संरक्षण अधिनियम, 2019 · धारा 39" if lang == "hi" else "Consumer Protection Act, 2019 · Section 39", "indiacode.nic.in", "https://www.indiacode.nic.in/handle/123456789/15256")
+                _add_source("e-Daakhil Online Consumer Redressal Portal", "edaakhil.nic.in", "https://edaakhil.nic.in")
+        elif jur_norm == "EU":
+            _add_source("GDPR Article 17 · Right to erasure (Regulation EU 2016/679)", "eur-lex.europa.eu", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679")
+        elif jur_norm == "US":
+            if "tenan" in dom_low or "housing" in dom_low or "evict" in dom_low:
+                _add_source("Texas Property Code § 24.005 · Notice to Vacate", "statutes.capitol.texas.gov", "https://statutes.capitol.texas.gov/Docs/PR/htm/PR.24.htm")
+            else:
+                _add_source("Fair Labor Standards Act · 29 U.S.C. § 207", "law.cornell.edu", "https://www.law.cornell.edu/uscode/text/29/207")
+        elif jur_norm == "GB":
+            if "tenan" in dom_low or "housing" in dom_low:
+                _add_source("Housing Act 1988 · Residential Tenancy & Possession", "legislation.gov.uk", "https://www.legislation.gov.uk/ukpga/1988/50/contents")
+            elif "employ" in dom_low:
+                _add_source("Employment Rights Act 1996", "legislation.gov.uk", "https://www.legislation.gov.uk/ukpga/1996/18/contents")
+            elif "privacy" in dom_low or "gdpr" in dom_low:
+                _add_source("Data Protection Act 2018 (UK GDPR)", "legislation.gov.uk", "https://www.legislation.gov.uk/ukpga/2018/12/contents")
+            else:
+                _add_source("Consumer Rights Act 2015 · Goods & Remedies", "legislation.gov.uk", "https://www.legislation.gov.uk/ukpga/2015/15/contents")
+        elif jur_norm == "CA":
+            if "privacy" in dom_low:
+                _add_source("Personal Information Protection and Electronic Documents Act (PIPEDA)", "laws-lois.justice.gc.ca", "https://laws-lois.justice.gc.ca/eng/acts/P-8.6/")
+            else:
+                _add_source("Canada Labour Code (R.S.C., 1985, c. L-2)", "laws-lois.justice.gc.ca", "https://laws-lois.justice.gc.ca/eng/acts/L-2/")
+        elif jur_norm == "AU":
+            if "employ" in dom_low or "wage" in dom_low:
+                _add_source("Fair Work Act 2009 · National Employment Standards", "legislation.gov.au", "https://www.legislation.gov.au/C2009A00028/latest/text")
+            else:
+                _add_source("Competition and Consumer Act 2010 · Australian Consumer Law", "legislation.gov.au", "https://www.legislation.gov.au/C2004A00109/latest/text")
+        elif jur_norm == "SG":
+            if "consumer" in dom_low:
+                _add_source("Consumer Protection (Fair Trading) Act 2003", "sso.agc.gov.sg", "https://sso.agc.gov.sg/Act/CPFTA2003")
+            elif "criminal" in dom_low or "harass" in dom_low:
+                _add_source("Protection from Harassment Act 2014", "sso.agc.gov.sg", "https://sso.agc.gov.sg/Act/PHA2014")
+            else:
+                _add_source("Employment Act 1968 (Singapore)", "sso.agc.gov.sg", "https://sso.agc.gov.sg/Act/EmA1968")
+        else:
+            _add_source("EUR-Lex Official Union Law Portal", "eur-lex.europa.eu", "https://eur-lex.europa.eu")
+            _add_source("India Code Official Statutory Repository", "indiacode.nic.in", "https://www.indiacode.nic.in")
+
+    sources = sources[:3]
 
     # Chips
     chips = []

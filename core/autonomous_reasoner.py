@@ -9,40 +9,59 @@ import re
 from typing import Dict, Any, Tuple, List, Optional
 from core.vector_db import query_vector_db
 
+def detect_explicit_jurisdiction(text: str) -> Optional[str]:
+    """
+    Detects an explicit country/region/state/statute mention in user text.
+    Returns a jurisdiction code ('IN', 'DE', 'CH', 'US', 'GB', 'EU', 'CA', 'AU', 'SG')
+    or None if no specific place was mentioned.
+    """
+    q_lower = (text or "").lower()
+    if not q_lower.strip():
+        return None
+
+    if any(w in q_lower for w in [
+        "india", "indian", "punjab", "delhi", "jalandhar", "mumbai", "chennai", "tamil nadu", "tamil", "anna nagar",
+        "bengaluru", "bangalore", "karnataka", "hyderabad", "telangana", "kolkata", "bengal", "kerala",
+        "maharashtra", "gujarat", "rajasthan", "haryana", "chandigarh", "bihar", "uttar pradesh",
+        "bns", "bnss", "bsa", "ipc", "challan", "parivahan", "e-daakhil", "lok adalat", "rupees", "₹"
+    ]) or re.search(r"\b(up|rto)\b", q_lower):
+        return "IN"
+    if any(w in q_lower for w in ["germany", "german", "deutschland", "berlin", "munich", "hamburg", "frankfurt", "bgb", "eigenbedarf", "kündigung", "mieter", "bußgeld"]):
+        return "DE"
+    if any(w in q_lower for w in ["switzerland", "swiss", "schweiz", "suisse", "zurich", "zürich", "geneva", "basel", "bern", "lausanne", "canton", "asloca", "schlichtungsbehörde"]):
+        return "CH"
+    if any(w in q_lower for w in [
+        "united states", "usa", "u.s.", "america", "american", "california", "texas", "new york", "nyc",
+        "florida", "illinois", "chicago", "los angeles", "flsa", "dmv", "dollars", "$"
+    ]):
+        return "US"
+    if any(w in q_lower for w in ["united kingdom", "britain", "british", "london", "england", "scotland", "wales", "manchester", "dvla", "£"]) or re.search(r"\buk\b", q_lower):
+        return "GB"
+    if any(w in q_lower for w in ["european union", "gdpr", "brussels", "eur-lex", "france", "paris", "italy", "rome", "spain", "madrid", "netherlands"]) or re.search(r"\beu\b", q_lower):
+        return "EU"
+    if any(w in q_lower for w in ["canada", "canadian", "ontario", "toronto", "vancouver", "quebec", "alberta", "british columbia", "pipeda"]):
+        return "CA"
+    if any(w in q_lower for w in ["australia", "australian", "sydney", "melbourne", "brisbane", "new south wales", "victoria", "queensland", "fair work"]):
+        return "AU"
+    if any(w in q_lower for w in ["singapore", "singaporean", "cpfta", "poha"]):
+        return "SG"
+    return None
+
+
 def detect_attributes_from_query(query: str, current_jur: str, current_cat: str, current_lang: str) -> Tuple[str, str, str]:
     """
     Intelligently auto-detects Region, Category, and Language if set to 'AUTO'.
+    Leaves Region as 'AUTO' when no place or region-specific clue was provided.
     """
     q_lower = query.lower()
 
-    # 1. AUTO-DETECT REGION
+    # 1. AUTO-DETECT REGION (never silently assume a country when none is specified)
     eff_jur = current_jur
     if current_jur in ("AUTO", "", None):
-        if any(w in q_lower for w in [
-            "india", "punjab", "delhi", "jalandhar", "mumbai", "chennai", "tamil nadu", "tamil", "anna nagar",
-            "bengaluru", "bangalore", "karnataka", "hyderabad", "telangana", "kolkata", "bengal", "kerala",
-            "maharashtra", "gujarat", "rajasthan", "haryana", "chandigarh", "bihar", "up", "uttar pradesh",
-            "bns", "bnss", "bsa", "ipc", "challan", "parivahan", "e-daakhil", "rto", "traffic police", "rupees", "₹"
-        ]):
-            eff_jur = "IN"
-        elif any(w in q_lower for w in ["germany", "deutschland", "berlin", "munich", "bgb", "eigenbedarf", "kündigung", "mieter"]):
-            eff_jur = "DE"
-        elif any(w in q_lower for w in ["switzerland", "schweiz", "suisse", "zurich", "geneva"]):
-            eff_jur = "CH"
-        elif any(w in q_lower for w in ["united states", "usa", "america", "california", "texas", "flsa", "dollars", "$"]):
-            eff_jur = "US"
-        elif any(w in q_lower for w in ["united kingdom", "uk", "london", "england", "scotland"]):
-            eff_jur = "GB"
-        elif any(w in q_lower for w in ["european union", "eu", "gdpr", "brussels", "erasure"]):
-            eff_jur = "EU"
-        elif any(w in q_lower for w in ["canada", "ontario", "toronto"]):
-            eff_jur = "CA"
-        elif any(w in q_lower for w in ["australia", "sydney", "melbourne"]):
-            eff_jur = "AU"
-        elif any(w in q_lower for w in ["singapore"]):
-            eff_jur = "SG"
-        else:
-            eff_jur = "IN" # Default primary jurisdiction
+        detected_jur = detect_explicit_jurisdiction(query)
+        eff_jur = detected_jur if detected_jur else "AUTO"
+    elif current_jur == "UK":
+        eff_jur = "GB"
 
     # 2. AUTO-DETECT CATEGORY
     eff_cat = current_cat
@@ -50,7 +69,7 @@ def detect_attributes_from_query(query: str, current_jur: str, current_cat: str,
         clean_q = re.sub(r'[^\w\s]', '', q_lower).strip()
         if clean_q in ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "namaste", "vanakkam", "sat sri akaal", "who are you", "what can you do"]:
             eff_cat = "General Legal Assistant"
-        elif any(w in q_lower for w in ["challan", "fine", "traffic", "speed limit", "speed", "driving", "license", "licence", "rto", "vehicle", "car", "bike", "police fine", "lok adalat", "virtual court"]):
+        elif any(w in q_lower for w in ["challan", "fine", "traffic", "speed limit", "speed", "driving", "license", "licence", "rto", "vehicle", "car", "bike", "police fine", "lok adalat", "virtual court", "citation", "ticket"]):
             eff_cat = "Traffic & Motor Vehicles Law"
         elif any(w in q_lower for w in ["intruder", "intruders", "theft", "stolen", "smuggle", "smuggled", "burglary", "housebreak", "break in", "trespass", "robbery", "cheating", "fraud", "scam", "fir", "bns", "bnss", "police station", "arrest", "ipc"]):
             eff_cat = "Criminal & Penal Law"
@@ -67,7 +86,7 @@ def detect_attributes_from_query(query: str, current_jur: str, current_cat: str,
         elif any(w in q_lower for w in ["contract", "agreement", "breach", "nda", "clause", "damages"]):
             eff_cat = "Commercial & Contract Disputes"
         else:
-            eff_cat = "Traffic & Motor Vehicles Law" if eff_jur == "IN" and "fine" in q_lower else "General Legal Advisory"
+            eff_cat = "General Legal Advisory"
 
     # 3. AUTO-DETECT LANGUAGE
     eff_lang = current_lang
@@ -88,19 +107,88 @@ def detect_attributes_from_query(query: str, current_jur: str, current_cat: str,
     return eff_jur, eff_cat, eff_lang
 
 
-def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO", language: str = "AUTO") -> Dict[str, Any]:
+def _build_region_clarification_card(eff_cat: str, eff_lang: str) -> Dict[str, Any]:
+    """Builds a concise clarifying prompt asking which region/place the user wants help with."""
+    if eff_lang == "hi":
+        headline = "कृपया बताएँ कि आप किस देश, राज्य या शहर के बारे में पूछ रहे हैं?"
+        body_text = (
+            "ट्रैफ़िक जुर्माना, किराएदारी, उपभोक्ता रिफ़ंड और अन्य कानूनी विकल्प **हर देश और राज्य के कानून के अनुसार अलग-अलग होते हैं**।\n\n"
+            "कृपया नीचे अपना **देश, राज्य या शहर** लिखें (या ऊपर **क्षेत्र / Region** ड्रॉपडाउन से चुनें) ताकि मैं आपको सही स्थानीय कानून, पोर्टल और कदम बता सकूँ।"
+        )
+        tag_label = f"स्थान आवश्यक · {eff_cat}"
+        chips = ["भारत (India)", "अमेरिका (United States)", "यूके (United Kingdom)", "स्विट्ज़रलैंड (Switzerland)", "जर्मनी (Germany)"]
+        disclaimer = "सटीक स्थानीय कानूनी प्रावधान बताने के लिए क्षेत्र की जानकारी आवश्यक है।"
+    elif eff_lang == "de":
+        headline = "Für welches Land, Bundesland oder welche Stadt möchten Sie rechtliche Hilfe?"
+        body_text = (
+            "Rechtliche Optionen (z. B. bei Bußgeldern, Mietrecht oder Verbraucherrechten) **unterscheiden sich je nach Land und Region**.\n\n"
+            "Bitte nennen Sie mir Ihr **Land oder Ihren Ort** (oder wählen Sie oben **Region**), damit ich die genauen Vorschriften und Portale nennen kann."
+        )
+        tag_label = f"Region klären · {eff_cat}"
+        chips = ["Deutschland", "Schweiz", "Österreich", "USA", "Vereinigtes Königreich"]
+        disclaimer = "Angabe der Region erforderlich, um geltendes lokales Recht anzuwenden."
+    else:
+        headline = "Which country, state, or city would you like help with?"
+        body_text = (
+            "Legal options vary significantly depending on local laws and courts where the issue happened.\n\n"
+            "Could you let me know the **specific country, state, or city** you want help for (or select it from the **Region** menu above)? Once you share the place, I'll give you the exact local options and official portals."
+        )
+        tag_label = f"Location Needed · {eff_cat}"
+        chips = ["India", "United States", "United Kingdom", "Switzerland", "Germany", "Canada"]
+        disclaimer = "Jurisdiction varies by location; share your country or state for exact statutory guidance."
+
+    return {
+        "headline": headline,
+        "body_text": body_text,
+        "tag_label": tag_label,
+        "verified_label": "Clarification",
+        "sources_label": "SOURCES",
+        "sources": [],
+        "chips": chips,
+        "disclaimer": disclaimer,
+        "is_clarification": True
+    }
+
+
+def reason_legally(
+    query: str,
+    jurisdiction: str = "AUTO",
+    category: str = "AUTO",
+    language: str = "AUTO",
+    history: Optional[List[Dict[str, Any]]] = None
+) -> Dict[str, Any]:
     """
     Main Autonomous Legal Reasoning Engine.
     Executes:
-    1. Query attribute auto-detection (Region, Category, Language).
+    1. Multi-turn context & attribute detection (respecting explicit Region selection;
+       asking for location if Region is AUTO and the query lacks a specific place).
     2. Vector database semantic search via ChromaDB.
     3. Google Gemini API LLM inference if key available; otherwise deep autonomous synthesis.
     """
-    eff_jur, eff_cat, eff_lang = detect_attributes_from_query(query, jurisdiction, category, language)
-    q_lower = query.lower()
+    effective_query = query
+    combined_history_text = query
+    history = history or []
+
+    # Check if user is answering a prior "Which country/region?" clarification turn
+    if history:
+        prev_assistant = next((m for m in reversed(history) if m.get("role") == "assistant"), None)
+        prev_user = next((m for m in reversed(history) if m.get("role") == "user" and m.get("content")), None)
+        prev_is_clarif = False
+        if prev_assistant:
+            prev_text = (prev_assistant.get("content") or "").lower()
+            prev_is_clarif = bool(prev_assistant.get("is_clarification")) or any(
+                phrase in prev_text for phrase in ["which country, state, or city", "किस देश, राज्य या शहर", "für welches land"]
+            )
+        if prev_is_clarif and prev_user and len(query.split()) <= 10:
+            prev_q_text = prev_user.get("content", "").strip()
+            effective_query = f"{prev_q_text} (Specified Jurisdiction / Location: {query.strip()})"
+            combined_history_text = f"{prev_q_text} {query}"
+
+    eff_jur, eff_cat, eff_lang = detect_attributes_from_query(combined_history_text, jurisdiction, category, language)
+    q_lower = effective_query.lower()
 
     # 0. INSTANT GREETING & ONBOARDING
-    clean_q = re.sub(r'[^\w\s]', '', q_lower).strip()
+    clean_q = re.sub(r'[^\w\s]', '', query.lower()).strip()
     if clean_q in ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "namaste", "vanakkam", "sat sri akaal", "who are you", "what can you do", "help"]:
         greeting_text = "Hello! I am Justice AI, your personal legal advisor."
         if eff_lang == "hi":
@@ -147,8 +235,34 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
             "card": card
         }
 
-    # Query ChromaDB Vector Database
-    retrieved_statutes = query_vector_db(query, eff_jur, eff_cat, top_k=2)
+    # 0.5 REGION CLARIFICATION FOR REGION-DEPENDENT QUERIES WHEN REGION IS AUTO & NO PLACE SPECIFIED
+    is_document_upload = "[user attached legal document context]" in q_lower
+    prev_was_clarification = bool(
+        history and (
+            (next((m for m in reversed(history) if m.get("role") == "assistant"), {}) or {}).get("is_clarification")
+            or any(
+                p in ((next((m for m in reversed(history) if m.get("role") == "assistant"), {}) or {}).get("content") or "").lower()
+                for p in ["which country, state, or city", "किस देश, राज्य या शहर", "für welches land"]
+            )
+        )
+    )
+
+    if jurisdiction in ("AUTO", "", None) and eff_jur == "AUTO" and not is_document_upload:
+        if prev_was_clarification:
+            # User replied with an unlisted location/region (e.g., "Japan", "Brazil", "Paris"): proceed using GLOBAL + named place
+            eff_jur = "GLOBAL"
+        else:
+            clarif_card = _build_region_clarification_card(eff_cat, eff_lang)
+            return {
+                "status": "success",
+                "jurisdiction": "AUTO",
+                "category": eff_cat,
+                "language": eff_lang,
+                "card": clarif_card
+            }
+
+    # Query ChromaDB Vector Database using resolved jurisdiction & category
+    retrieved_statutes = query_vector_db(effective_query, eff_jur, eff_cat, top_k=2)
 
     # Check for Gemini API key
     gemini_key = os.environ.get("GEMINI_API_KEY", "")
@@ -166,7 +280,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         try:
             from core.llm import LLMProvider
             llm = LLMProvider(provider="gemini", api_key=gemini_key)
-            llm_reply = llm.generate_chat_response(query, [], retrieved_statutes, eff_jur, eff_cat, eff_lang)
+            llm_reply = llm.generate_chat_response(effective_query, history, retrieved_statutes, eff_jur, eff_cat, eff_lang)
             if llm_reply and len(llm_reply) > 50:
                 from core.legal_formatter import format_assistant_response_data
                 card = format_assistant_response_data(llm_reply, eff_jur, eff_cat, retrieved_statutes, eff_lang)
@@ -185,7 +299,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
     # =========================================================================
     
     # CASE 0: INTRUDERS / BURGLARY / THEFT & HOUSEBREAKING (INDIA / BNS)
-    if any(w in q_lower for w in ["intruder", "intruders", "stole", "stolen", "smuggle", "smuggled", "burglary", "housebreak", "break in", "trespass", "theft", "robbery"]):
+    if eff_jur in ("IN", "GLOBAL") and any(w in q_lower for w in ["intruder", "intruders", "stole", "stolen", "smuggle", "smuggled", "burglary", "housebreak", "break in", "trespass", "theft", "robbery"]):
         headline = "File an immediate Police FIR for House-Breaking and Theft. Your evidence is fully admissible in court."
         body_text = (
             "Here is the simple, step-by-step action plan for what you should do right now:\n\n"
@@ -216,8 +330,8 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
             "How to prepare Section 63 electronic evidence certificate?"
         ]
 
-    # CASE 1: TRAFFIC POLICE KEYS CONFISCATION & MOTOR VEHICLE RIGHTS
-    elif "key" in q_lower and ("police" in q_lower or "traffic" in q_lower or "bike" in q_lower or "car" in q_lower):
+    # CASE 1: TRAFFIC POLICE KEYS CONFISCATION & MOTOR VEHICLE RIGHTS (INDIA)
+    elif eff_jur == "IN" and "key" in q_lower and ("police" in q_lower or "traffic" in q_lower or "bike" in q_lower or "car" in q_lower):
         headline = "No. Traffic police officers have NO legal authority to snatch your vehicle ignition keys."
         body_text = (
             "Under the Motor Vehicles Act 1988 and Indian Police guidelines:\n\n"
@@ -232,7 +346,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         chips = ["Who has power to issue challans?", "Can police deflate tyres?", "How to report police misbehavior?"]
 
     # CASE 2: TRAFFIC CHALLAN & OPTIONS OTHER THAN PAYING (INDIA)
-    elif "challan" in q_lower or ("traffic" in q_lower and ("fine" in q_lower or "pay" in q_lower or "police" in q_lower)):
+    elif eff_jur == "IN" and ("challan" in q_lower or ("traffic" in q_lower and ("fine" in q_lower or "pay" in q_lower or "police" in q_lower))):
         headline = "You are not obligated to pay on the spot. You have multiple statutory rights to contest, compound, or reduce the fine."
         body_text = (
             "Under Indian Motor Vehicles law, you have four distinct legal remedies beyond immediately paying a traffic challan:\n\n"
@@ -256,7 +370,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         ]
 
     # CASE 2: LEGAL DRINKING AGE IN INDIA
-    elif "drinking age" in q_lower or ("alcohol" in q_lower and "age" in q_lower) or ("legal age" in q_lower and ("drink" in q_lower or "liquor" in q_lower)):
+    elif eff_jur == "IN" and ("drinking age" in q_lower or ("alcohol" in q_lower and "age" in q_lower) or ("legal age" in q_lower and ("drink" in q_lower or "liquor" in q_lower))):
         headline = "There is no single national drinking age in India. It ranges from 18 to 25 depending strictly on the State."
         body_text = (
             "Under the Seventh Schedule, List II (Entry 8) of the Constitution of India, alcohol production, sale, and consumption are exclusive State subjects. "
@@ -305,7 +419,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         ]
 
     # CASE 4: TENANCY & EVICTION (GERMANY / BGB)
-    elif "landlord" in q_lower or "evict" in q_lower or "tenancy" in q_lower or "eigenbedarf" in q_lower:
+    elif eff_jur == "DE" and ("landlord" in q_lower or "evict" in q_lower or "tenancy" in q_lower or "eigenbedarf" in q_lower):
         headline = "In most cases, yes. A landlord needs a legitimate reason to end an open-ended residential lease."
         body_text = (
             "Under German Civil Code (BGB) § 573, an ordinary termination by the landlord requires a legitimate justified interest (berechtigtes Interesse). "
@@ -318,8 +432,8 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         ]
         chips = ["What if I have lived here over 8 years?", "Can I object to the termination?", "Find a tenant association"]
 
-    # CASE 5: CONSUMER PROTECTION & DEFECTIVE GOODS
-    elif "defective" in q_lower or "refund" in q_lower or "consumer" in q_lower or "warranty" in q_lower:
+    # CASE 5: CONSUMER PROTECTION & DEFECTIVE GOODS (INDIA)
+    elif eff_jur == "IN" and ("defective" in q_lower or "refund" in q_lower or "consumer" in q_lower or "warranty" in q_lower):
         headline = "You have the statutory right to file a consumer complaint for repair, replacement, or a full refund."
         body_text = (
             "Under Section 39 of the Consumer Protection Act, 2019, aggrieved consumers have the right to claim replacement of defective goods, a full refund of price with interest, "
@@ -332,7 +446,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         chips = ["Draft a formal notice to seller", "How to file on e-Daakhil?", "Calculate interest claim"]
 
     # CASE 6: NON-COMPETE CLAUSES IN EMPLOYMENT (INDIA)
-    elif "non-compete" in q_lower or "non compete" in q_lower or ("restraint" in q_lower and "trade" in q_lower):
+    elif eff_jur == "IN" and ("non-compete" in q_lower or "non compete" in q_lower or ("restraint" in q_lower and "trade" in q_lower)):
         headline = "In India, post-employment non-compete clauses are completely void and legally unenforceable."
         body_text = (
             "Under Section 27 of the Indian Contract Act, 1872, every agreement that restrains anyone from exercising a lawful profession, trade, or business is void to that extent. "
@@ -346,7 +460,7 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
         chips = ["Can ex-employer sue for damages?", "Difference between NDA and non-compete", "Notice period buy-out rules"]
 
     # CASE 8: ZERO FIR & ARREST RIGHTS (INDIA / BNSS)
-    elif "fir" in q_lower or "police station" in q_lower or "arrest" in q_lower:
+    elif eff_jur == "IN" and ("fir" in q_lower or "police station" in q_lower or "arrest" in q_lower):
         headline = "You have the statutory right to file a 'Zero FIR' at any police station regardless of jurisdiction."
         body_text = (
             "Under Indian criminal law (Section 173 of Bharatiya Nagarik Suraksha Sanhita 2023 / Section 154 CrPC):\n\n"
@@ -377,7 +491,11 @@ def reason_legally(query: str, jurisdiction: str = "AUTO", category: str = "AUTO
             ]
         else:
             body_text = "Under the applicable civil and statutory codes, formal written notice is required to establish cause of action. Review local municipal bylaws and statute of limitations."
-            sources = [{"title": "Official Statutory Framework", "domain": "official-gazette.gov", "url": "#"}]
+            from core.legal_formatter import format_assistant_response_data
+            fallback_card = format_assistant_response_data(body_text, eff_jur, eff_cat, retrieved_statutes, eff_lang)
+            sources = fallback_card.get("sources") or [
+                {"title": "India Code Official Statutory Repository", "domain": "indiacode.nic.in", "url": "https://www.indiacode.nic.in"}
+            ]
         
         chips = ["Draft formal legal demand notice", "Check statutory limitation period", "Schedule advocate consultation"]
 

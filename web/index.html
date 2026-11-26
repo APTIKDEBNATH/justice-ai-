@@ -27,8 +27,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+    }
+    *::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    *::-webkit-scrollbar-track {
+      background: var(--scroll-track);
+    }
+    *::-webkit-scrollbar-thumb {
+      background-color: var(--scroll-thumb);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background-color: var(--scroll-thumb-hover);
+    }
+    *::-webkit-scrollbar-corner {
+      background: transparent;
+    }
     :root {
+      color-scheme: light;
       --bg-main: #F6F5F1;
       --bg-sidebar: #ECEAE2;
       --border-sidebar: #DEDBD0;
@@ -45,9 +69,13 @@
       --disclaimer-border: #EBDDB5;
       --disclaimer-text: #6B4E10;
       --card-bg: #FFFFFF;
+      --scroll-track: transparent;
+      --scroll-thumb: rgba(26, 31, 43, 0.16);
+      --scroll-thumb-hover: rgba(26, 31, 43, 0.30);
     }
     /* Strict Dark Theme (Zero White Elements - Pure Monochrome & Silver Slate) */
     body.dark-theme {
+      color-scheme: dark;
       --bg-main: #000000;
       --bg-sidebar: #080808;
       --border-sidebar: #1E1E22;
@@ -64,6 +92,9 @@
       --disclaimer-border: #1E1E22;
       --disclaimer-text: #71717A;
       --card-bg: #0E0E10;
+      --scroll-track: transparent;
+      --scroll-thumb: rgba(161, 161, 170, 0.20);
+      --scroll-thumb-hover: rgba(161, 161, 170, 0.36);
     }
     body.dark-theme .pill-primary {
       background: #27272A !important;
@@ -123,15 +154,19 @@
       border: 1px solid #3F3F46 !important;
       color: #D4D4D8 !important;
     }
-    body.dark-theme .confidence-bar-inner {
-      background: #52525B !important;
-    }
-    body.dark-theme .confidence-bar-outer {
-      background: #202024 !important;
-    }
-    body.dark-theme .auth-card {
+    body.dark-theme .auth-card,
+    body.dark-theme .confirm-card {
       background: #0E0E10 !important;
       border-color: #222226 !important;
+    }
+    body.dark-theme .btn-confirm-cancel {
+      background: #18181B !important;
+      border-color: #2E2E35 !important;
+      color: #E4E4E7 !important;
+    }
+    body.dark-theme .btn-confirm-cancel:hover {
+      background: #27272A !important;
+      border-color: #3F3F46 !important;
     }
     body.dark-theme .auth-input {
       background: #080808 !important;
@@ -169,6 +204,10 @@
     body.dark-theme .theme-toggle-btn:hover {
       background-color: #1C1C20 !important;
     }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
     body {
       margin: 0;
       font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -177,8 +216,13 @@
       -webkit-font-smoothing: antialiased;
       transition: background-color 0.25s ease, color 0.25s ease;
     }
+    #mainAppLayout,
+    #mainAppLayout > main {
+      height: 100vh;
+      height: 100dvh;
+    }
     button, input, select, textarea { font: inherit; }
-    svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; }
+    svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; pointer-events: none; }
     
     .pill {
       display: inline-flex;
@@ -209,14 +253,18 @@
     .chip {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       min-height: 38px;
-      padding: 0 14px;
+      padding: 8px 14px;
       border: 1px solid var(--border-input);
       border-radius: 999px;
       background: transparent;
       color: var(--text-secondary);
       cursor: pointer;
       font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      max-width: 100%;
       transition: all 0.2s ease;
       margin-right: 8px;
       margin-bottom: 8px;
@@ -401,115 +449,129 @@
       stroke: var(--text-secondary);
     }
 
-    /* Top Bar Dropdown Menus - White boxes with Blue hover */
+    /* Top Bar Dropdown Menus - Pure Monocolour */
     .bar .sel {
       position: relative;
       display: inline-flex;
       align-items: center;
-      background: #FFFFFF !important;
+      background: var(--card-bg) !important;
       border: 1px solid var(--border-input) !important;
       border-radius: 8px;
-      height: 38px;
-      overflow: hidden;
+      height: 36px;
       transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
       cursor: pointer;
     }
     .bar .sel:hover,
-    .bar .sel:focus-within {
-      background: var(--accent-primary) !important;
-      border-color: var(--accent-primary) !important;
+    .bar .sel:focus-within,
+    .bar .sel.open {
+      background: var(--bg-sidebar) !important;
+      border-color: var(--text-secondary) !important;
     }
-    .bar .sel select {
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      background: transparent !important;
-      border: none !important;
-      outline: none !important;
-      box-shadow: none !important;
-      width: calc(100% + 28px) !important;
-      margin-right: -28px !important;
-      padding: 6px 36px 6px 14px;
-      color: var(--text-primary) !important;
+    .custom-select-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      height: 100%;
+      padding: 0 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      height: 100%;
-      white-space: nowrap !important;
-      transition: color 0.2s ease;
+      white-space: nowrap;
+      outline: none;
     }
-    #selRegion {
-      min-width: 125px;
-    }
-    #selCategory {
-      min-width: 195px;
-    }
-    #selLanguage {
-      min-width: 165px;
-    }
-    .bar .sel:hover select,
-    .bar .sel:focus-within select {
-      color: #FFFFFF !important;
-    }
-    .bar .sel svg {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      z-index: 2;
+    .custom-select-btn svg {
+      position: static !important;
+      transform: none !important;
       width: 14px;
       height: 14px;
-      stroke: var(--text-secondary) !important;
-      transition: stroke 0.2s ease;
+      stroke: var(--text-secondary);
+      flex-shrink: 0;
+      transition: transform 0.18s ease, stroke 0.18s ease;
     }
-    .bar .sel:hover svg,
-    .bar .sel:focus-within svg {
-      stroke: #FFFFFF !important;
+    .bar .sel.open .custom-select-btn svg {
+      transform: rotate(180deg) !important;
+      stroke: var(--text-primary);
     }
-    .bar .sel select option {
-      background: #FFFFFF !important;
-      color: #111827 !important;
-      padding: 8px 12px;
+    .custom-select-menu {
+      position: fixed;
+      z-index: 9999;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+      padding: 6px;
+      min-width: 190px;
+      max-width: calc(100vw - 24px);
+      max-height: min(320px, 60dvh);
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
     }
-    .bar .sel select option:hover,
-    .bar .sel select option:focus,
-    .bar .sel select option:checked {
-      background: var(--accent-primary) !important;
-      color: #FFFFFF !important;
+    .custom-select-option {
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      white-space: nowrap;
+      transition: background 0.12s ease;
     }
+    .custom-select-option:hover {
+      background: var(--bg-sidebar);
+    }
+    .custom-select-option.selected {
+      background: var(--bg-sidebar);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .bar .sel select {
+      display: none !important;
+    }
+    #btnRegionSelect { min-width: 112px; }
+    #btnCategorySelect { min-width: 155px; max-width: 215px; }
+    #btnCategorySelect span { overflow: hidden; text-overflow: ellipsis; }
+    #btnLanguageSelect { min-width: 145px; }
     body.dark-theme .bar .sel {
       background: #141416 !important;
       border-color: #27272A !important;
     }
     body.dark-theme .bar .sel:hover,
-    body.dark-theme .bar .sel:focus-within {
-      background: #2563EB !important;
-      border-color: #2563EB !important;
+    body.dark-theme .bar .sel:focus-within,
+    body.dark-theme .bar .sel.open {
+      background: #1F1F24 !important;
+      border-color: #52525B !important;
     }
-    body.dark-theme .bar .sel select {
+    body.dark-theme .custom-select-btn {
       color: #E4E4E7 !important;
     }
-    body.dark-theme .bar .sel:hover select,
-    body.dark-theme .bar .sel:focus-within select {
-      color: #FFFFFF !important;
-    }
-    body.dark-theme .bar .sel select option {
+    body.dark-theme .custom-select-menu {
       background: #141416 !important;
+      border-color: #27272A !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+    }
+    body.dark-theme .custom-select-option {
       color: #E4E4E7 !important;
     }
-    body.dark-theme .bar .sel select option:hover,
-    body.dark-theme .bar .sel select option:focus,
-    body.dark-theme .bar .sel select option:checked {
-      background: #2563EB !important;
+    body.dark-theme .custom-select-option:hover,
+    body.dark-theme .custom-select-option.selected {
+      background: #27272A !important;
       color: #FFFFFF !important;
     }
-    body.dark-theme .bar .sel svg {
+    body.dark-theme .custom-select-btn svg {
       stroke: #A1A1AA !important;
     }
-    body.dark-theme .bar .sel:hover svg,
-    body.dark-theme .bar .sel:focus-within svg {
+    body.dark-theme .bar .sel:hover .custom-select-btn svg,
+    body.dark-theme .bar .sel.open .custom-select-btn svg {
       stroke: #FFFFFF !important;
     }
 
@@ -640,26 +702,106 @@
       display: none;
     }
     .auth-close-btn {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: none;
       background: transparent;
       color: var(--text-secondary);
-      font-size: 18px;
+      font-size: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s;
       line-height: 1;
+      padding: 0;
     }
     .auth-close-btn:hover {
       background: var(--border-light);
       color: var(--text-primary);
+    }
+
+    /* Chat Deletion Confirmation Modal */
+    .confirm-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 410px;
+      padding: 26px 26px 24px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      animation: fadeIn 0.2s ease;
+    }
+    .confirm-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 36px;
+    }
+    .confirm-title {
+      margin: 0;
+      font-family: 'Newsreader', 'Noto Serif Devanagari', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.25;
+    }
+    .confirm-desc {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .confirm-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .btn-confirm-cancel {
+      min-height: 38px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-main);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-confirm-cancel:hover {
+      background: var(--bg-sidebar);
+      border-color: var(--text-secondary);
+    }
+    .btn-confirm-delete {
+      min-height: 38px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid #b91c1c;
+      background: #dc2626;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, opacity 0.15s ease;
+    }
+    .btn-confirm-delete:hover {
+      background: #b91c1c;
+    }
+    .btn-confirm-delete:disabled {
+      opacity: 0.65;
+      cursor: wait;
     }
 
     /* User Profile in Sidebar */
@@ -1162,7 +1304,7 @@
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
-      color: var(--accent-primary) !important;
+      color: var(--text-primary) !important;
       transform: scale(1.15) !important;
     }
     .btn-sidebar-arrow-toggle:active,
@@ -1183,14 +1325,65 @@
     .bar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 20px;
+      gap: 10px;
+      padding: 10px 18px;
       border-bottom: 1px solid var(--border-light);
       background: var(--bg-main);
       flex-wrap: nowrap;
       min-height: 56px;
       box-sizing: border-box;
       overflow-x: auto;
+    }
+    .bar-center-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+    /* Toast Banner */
+    .toast-banner {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #18191c;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      z-index: 10002;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    body.dark-theme .toast-banner {
+      background: #f4f4f5;
+      color: #111215;
+    }
+    @media(min-width: 821px) {
+      .bar {
+        display: grid !important;
+        grid-template-columns: 1fr auto 1fr !important;
+        align-items: center !important;
+        overflow: visible !important;
+      }
+      .btn-sidebar-arrow-toggle {
+        justify-self: start;
+      }
+      .bar-center-controls {
+        justify-self: center;
+      }
+      .bar-right-actions {
+        justify-self: end;
+        margin-left: 0 !important;
+      }
     }
 
     /* Mobile Chat & Full Responsiveness */
@@ -1238,10 +1431,40 @@
         letter-spacing: 0.03em !important;
         white-space: nowrap !important;
       }
-      .landing-hero { padding: 40px 16px 36px; }
-      .hero-subtext { font-size: 15px; }
-      .landing-section { padding: 40px 16px; }
+      .landing-hero { padding: 36px 16px 32px; }
+      .hero-badge {
+        max-width: 100%;
+        padding: 6px 12px !important;
+        font-size: 10px !important;
+        line-height: 1.35;
+        text-align: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .hero-catchphrase {
+        font-size: clamp(30px, 8.5vw, 44px) !important;
+        margin-bottom: 14px !important;
+      }
+      .hero-subtext {
+        font-size: 15px !important;
+        line-height: 1.55 !important;
+        margin-bottom: 24px !important;
+      }
+      .hero-cta-btn {
+        width: 100% !important;
+        max-width: 300px !important;
+        justify-content: center !important;
+        padding: 14px 24px !important;
+        font-size: 15px !important;
+      }
+      .section-title { font-size: clamp(24px, 6.5vw, 32px) !important; }
+      .section-header { margin-bottom: 28px !important; }
+      .landing-section { padding: 36px 16px; }
+      .landing-final-cta { padding: 40px 16px 48px !important; }
+      .landing-footer { padding: 28px 16px !important; }
+      .statute-card, .feature-card, .scenario-card { padding: 18px 16px !important; }
       .jurisdiction-grid, .features-grid, .scenarios-grid { grid-template-columns: 1fr !important; }
+      .features-grid { gap: 14px !important; }
 
       /* Mobile Sidebar as an off-canvas drawer */
       .side {
@@ -1318,19 +1541,25 @@
         transform: rotate(0deg);
       }
 
-      /* Mobile Header Bar & Filters */
+      /* Mobile Header Bar (Row 1: Sidebar Toggle + Theme + Share; Row 2: Scrollable Filters) */
       .bar {
         padding: 8px 12px !important;
         gap: 8px !important;
         display: flex !important;
         align-items: center !important;
-        overflow-x: auto !important;
-        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        overflow-x: visible !important;
         min-height: auto !important;
-        -webkit-overflow-scrolling: touch !important;
       }
-      .bar::-webkit-scrollbar {
-        display: none !important;
+      .bar-center-controls {
+        order: 3 !important;
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr) minmax(0, 1fr) !important;
+        align-items: center !important;
+        gap: 6px !important;
+        overflow: visible !important;
       }
       .btn-sidebar-arrow-toggle {
         width: 34px !important;
@@ -1339,73 +1568,594 @@
         min-height: 34px !important;
       }
       .bar .fld {
-        flex: 0 0 auto !important;
+        min-width: 0 !important;
+        width: 100% !important;
         font-size: 11px !important;
         gap: 4px !important;
       }
+      .bar .fld > span:first-child {
+        display: none !important;
+      }
       .bar .sel {
-        height: 32px !important;
-        min-height: 32px !important;
-        border-radius: 7px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        border-radius: 8px !important;
       }
-      .bar .sel select {
-        height: 100% !important;
+      .custom-select-btn {
+        width: 100% !important;
+        min-width: 0 !important;
         font-size: 12px !important;
-        padding: 0 24px 0 8px !important;
+        padding: 0 8px !important;
+        gap: 4px !important;
       }
-      #selRegion { min-width: 95px !important; }
-      #selCategory { min-width: 140px !important; }
-      #selLanguage { min-width: 120px !important; }
+      .custom-select-btn span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+      }
+      #btnRegionSelect, #btnCategorySelect, #btnLanguageSelect {
+        min-width: 0 !important;
+        max-width: none !important;
+      }
+      .custom-select-option {
+        white-space: normal !important;
+        word-break: break-word !important;
+      }
       .bar-right-actions {
-        margin-left: 4px !important;
+        margin-left: auto !important;
         gap: 6px !important;
       }
       .bar-right-actions .pill {
-        min-height: 32px !important;
-        height: 32px !important;
-        padding: 0 10px !important;
+        min-height: 34px !important;
+        height: 34px !important;
+        padding: 0 11px !important;
         font-size: 12px !important;
       }
       .bar-right-actions .theme-toggle-btn {
-        width: 32px !important;
-        height: 32px !important;
-        min-width: 32px !important;
-        min-height: 32px !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
       }
 
-      /* Mobile Chat Feed & Bubble Padding */
+      /* Mobile Touch Visibility for Sidebar Chat Delete */
+      .recent-del-btn {
+        opacity: 0.72 !important;
+        padding: 6px !important;
+        right: 6px !important;
+      }
+      .recent-item > span:first-child {
+        width: calc(100% - 34px) !important;
+      }
+
+      /* Mobile Chat Feed, Cards, Source Pills & Modals */
       #chatFeed {
         padding: 14px 12px 18px !important;
         gap: 16px !important;
         max-width: 100% !important;
       }
+      .assistant-response-card {
+        gap: 10px !important;
+        padding: 2px 0 16px !important;
+      }
+      .legal-body {
+        font-size: 14px !important;
+        line-height: 1.58 !important;
+      }
+      .source-pill {
+        padding: 7px 10px !important;
+        font-size: 12px !important;
+        max-width: 100% !important;
+      }
+      .source-pill > span:first-child {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .action-btn-pill {
+        min-height: 34px !important;
+        padding: 6px 12px !important;
+      }
+      .chip {
+        font-size: 12.5px !important;
+        text-align: left !important;
+        padding: 7px 12px !important;
+        margin-right: 0 !important;
+        margin-bottom: 0 !important;
+      }
       .chat-user-bubble {
         max-width: 90% !important;
         font-size: 14.5px !important;
         padding: 10px 14px !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 6px !important;
+      }
+      .auth-overlay,
+      .contact-overlay {
+        padding: 14px !important;
+      }
+      .auth-card,
+      .contact-card,
+      .confirm-card {
+        padding: 24px 18px !important;
+        border-radius: 18px !important;
+        max-height: calc(100dvh - 28px);
+        overflow-y: auto;
       }
 
       /* Mobile Fixed Input Bar */
       .chat-composer-bar {
-        padding: 8px 12px 14px !important;
+        padding: 8px 10px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
       }
-      #chatInput {
-        min-height: 44px !important;
+      .antigravity-composer-box {
+        padding: 10px 12px 8px !important;
+        border-radius: 16px !important;
+      }
+      .composer-textarea {
         font-size: 16px !important; /* Prevents iOS auto-zoom */
-        padding: 0 16px !important;
-        border-radius: 22px !important;
+        min-height: 24px !important;
       }
-      .chat-composer-bar button[onclick="sendUserQuery()"] {
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
+      .antigravity-pill {
+        padding: 2px 6px !important;
+        font-size: 11.5px !important;
+      }
+      .composer-grounding-pill {
+        padding: 2px 6px !important;
+        font-size: 11px !important;
+      }
+      .composer-tool-btn {
+        width: 30px !important;
+        height: 30px !important;
+      }
+      .antigravity-submit-circle {
+        width: 30px !important;
+        height: 30px !important;
       }
       #lblInputFootnote {
         font-size: 11px !important;
         margin-top: 4px !important;
         line-height: 1.3 !important;
       }
+    }
+
+    /* Compact Phone Refinement (<= 420px screens like iPhone SE / Galaxy A) */
+    @media(max-width: 420px) {
+      .confirm-actions {
+        gap: 8px;
+      }
+      .confirm-actions button {
+        flex: 1;
+        min-height: 42px;
+      }
+      .antigravity-pill span {
+        max-width: 95px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .composer-grounding-pill span:not(.grounding-dot) {
+        display: none;
+      }
+      .composer-toolbar-left, .composer-toolbar-right {
+        gap: 4px !important;
+      }
+    }
+
+    /* ==========================================================================
+       ANTIGRAVITY COMPOSER LOADOUT STYLING
+       ========================================================================== */
+    .antigravity-composer-box {
+      max-width: 768px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 12px 14px 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    body.dark-theme .antigravity-composer-box {
+      background: #111215 !important;
+      border-color: #24262c !important;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    .antigravity-composer-box:focus-within {
+      border-color: var(--text-secondary) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .antigravity-composer-box.drag-over {
+      border-color: var(--text-primary) !important;
+      background: var(--bg-sidebar) !important;
+    }
+
+    /* Attachment Preview Strip */
+    .composer-attachments-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border-light);
+    }
+
+    .attachment-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-main);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 4px 8px 4px 6px;
+      font-size: 12px;
+      color: var(--text-primary);
+      max-width: 220px;
+      user-select: none;
+    }
+
+    .attachment-chip img {
+      width: 28px;
+      height: 28px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .attachment-chip-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+
+    .attachment-chip-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 130px;
+    }
+
+    .attachment-chip-remove {
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0 2px;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+    }
+    .attachment-chip-remove:hover {
+      color: #ef4444;
+    }
+
+    /* Textarea Input */
+    .composer-textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14.5px;
+      line-height: 1.5;
+      outline: none;
+      resize: none;
+      min-height: 24px;
+      max-height: 140px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      padding: 0;
+    }
+
+    .composer-textarea::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.75;
+    }
+
+    /* Toolbar Row */
+    .composer-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 4px;
+      user-select: none;
+    }
+
+    .composer-toolbar-left,
+    .composer-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Tool Buttons (+, Mic, etc.) */
+    .composer-tool-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .composer-tool-btn:hover {
+      background: var(--border-light);
+      color: var(--text-primary);
+    }
+
+    body.dark-theme .composer-tool-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    /* Voice Mic Active Pulse */
+    .btn-mic.recording {
+      background: rgba(239, 68, 68, 0.15) !important;
+      color: #ef4444 !important;
+      animation: pulse-recording 1.4s infinite ease-in-out;
+    }
+
+    @keyframes pulse-recording {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Original Blue Arrow Submit Button */
+    .antigravity-submit-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: #1F4E79 !important;
+      color: #ffffff !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 2px 8px rgba(31, 78, 121, 0.25);
+    }
+
+    body.dark-theme .antigravity-submit-circle {
+      background: #1F4E79 !important;
+      color: #ffffff !important;
+    }
+
+    body:not(.dark-theme) .antigravity-submit-circle {
+      background: #1F4E79 !important;
+      color: #ffffff !important;
+    }
+
+    .antigravity-submit-circle:hover {
+      transform: scale(1.06);
+      filter: brightness(1.1);
+    }
+
+    .antigravity-submit-circle:active {
+      transform: scale(0.95);
+    }
+
+    /* Monocolour Popover Menus (+ Attachment Menu & Share Menu) */
+    .popover-menu-up {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      padding: 6px;
+      min-width: 195px;
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .popover-menu-down {
+      position: fixed;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      padding: 6px;
+      min-width: 215px;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .popover-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: background 0.15s ease;
+    }
+    .popover-menu-item:hover {
+      background: var(--bg-sidebar);
+    }
+    .popover-menu-item svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .popover-menu-item:hover svg {
+      stroke: var(--text-primary);
+    }
+    body.dark-theme .popover-menu-up,
+    body.dark-theme .popover-menu-down {
+      background: #141416 !important;
+      border-color: #27272A !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+    }
+    body.dark-theme .popover-menu-item {
+      color: #E4E4E7 !important;
+    }
+    body.dark-theme .popover-menu-item:hover {
+      background: #27272A !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Structured Legal Brief Card & Markdown Typography */
+    .assistant-response-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 4px 0 18px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .legal-body {
+      font-size: 14.5px;
+      line-height: 1.62;
+      color: var(--text-body);
+    }
+    .legal-body p {
+      margin: 0 0 10px 0;
+    }
+    .legal-body p:last-child {
+      margin-bottom: 0;
+    }
+    .legal-body .legal-h {
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--text-primary);
+      margin: 14px 0 6px 0;
+    }
+    .legal-body .legal-h:first-child {
+      margin-top: 2px;
+    }
+    .legal-body ul,
+    .legal-body ol {
+      margin: 4px 0 10px 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .legal-body li {
+      padding-left: 2px;
+    }
+    .legal-body strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .legal-body a {
+      color: var(--text-primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+    }
+    .legal-sources-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-top: 2px;
+    }
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      max-width: 100%;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .source-pill:hover {
+      border-color: var(--text-secondary);
+      background: var(--bg-sidebar);
+    }
+    .source-pill-domain {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .card-utility-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 4px;
+    }
+    .card-disclaimer-note {
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+
+    /* Audio Readout Pill on Response Cards */
+    .action-btn-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-main);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn-pill:hover {
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+    }
+
+    .action-btn-pill.speaking {
+      background: rgba(37, 99, 235, 0.1) !important;
+      border-color: var(--accent-primary) !important;
+      color: var(--accent-primary) !important;
+      animation: pulse-speaking 1.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-speaking {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
@@ -1622,19 +2372,12 @@
      ========================================================================== -->
 <div id="authOverlay" class="auth-overlay" style="display: none;">
   <div class="auth-card">
-    <button class="auth-close-btn" onclick="closeAuthModal()" title="Close">&times;</button>
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.03em;">JUSTICE AI</span>
-      </div>
-      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark / Light Mode" aria-label="Toggle Theme" style="margin-right: 32px;">
-        <svg viewBox="0 0 24 24" id="themeIconAuth" width="20" height="20" style="stroke: currentColor;">
-          <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
-        </svg>
-      </button>
+    <div style="position: relative; display: flex; align-items: center; justify-content: center; min-height: 44px;">
+      <span style="font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; line-height: 1; text-align: center;">JUSTICE AI</span>
+      <button class="auth-close-btn" onclick="closeAuthModal()" title="Close" aria-label="Close" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">&times;</button>
     </div>
 
-    <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-top: -8px;" id="authSubtitle">
+    <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-top: -6px; text-align: center;" id="authSubtitle">
       Universal Legal Intelligence. Sign in to access your confidential case advisory and conversation history.
     </div>
 
@@ -1657,12 +2400,6 @@
         <input type="password" id="loginPassword" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
       </div>
       <button type="submit" class="pill pill-primary" style="margin-top: 8px;">Sign In to Dashboard</button>
-      
-      <div style="text-align: center; margin-top: 4px;">
-        <button type="button" onclick="quickDemoLogin()" style="background: none; border: none; color: var(--accent-primary); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: underline;">
-          Try instant evaluator demo account
-        </button>
-      </div>
     </form>
 
     <!-- CREATE ACCOUNT FORM -->
@@ -1717,30 +2454,41 @@
   </div>
 </div>
 
+<!-- ==========================================================================
+     1.6. CHAT DELETION CONFIRMATION MODAL
+     ========================================================================== -->
+<div id="deleteConfirmModal" class="auth-overlay" style="display: none; z-index: 10002;" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle" onclick="if (event.target === this) closeDeleteConfirmModal()">
+  <div class="confirm-card">
+    <div class="confirm-header">
+      <h3 class="confirm-title" id="deleteConfirmTitle">Delete consultation?</h3>
+      <button type="button" class="auth-close-btn" onclick="closeDeleteConfirmModal()" title="Cancel" aria-label="Close" style="width: 34px; height: 34px; font-size: 26px;">&times;</button>
+    </div>
+    <p class="confirm-desc" id="deleteConfirmDesc">This chat and its messages will be permanently removed from your history.</p>
+    <div class="confirm-actions">
+      <button type="button" class="btn-confirm-cancel" id="btnCancelDelete" onclick="closeDeleteConfirmModal()">Cancel</button>
+      <button type="button" class="btn-confirm-delete" id="btnConfirmDelete" onclick="confirmPendingDeleteConversation()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- 2. MAIN APPLICATION (Visible once logged in or guest consulting) -->
-<div id="mainAppLayout" style="display: none; height: 100vh; overflow: hidden; background: var(--bg-main);">
+<div id="mainAppLayout" style="display: none; overflow: hidden; background: var(--bg-main);">
   <!-- Backdrop Overlay for Mobile Drawer -->
   <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
 
   <!-- Sidebar -->
   <aside class="side" id="chatSidebar">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; margin-top: -4px;">
-      <span onclick="showLandingView()" style="font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 600; color: var(--text-primary); cursor: pointer; user-select: none; text-transform: uppercase; letter-spacing: 0.03em;" title="Return to Overview" id="brandTitle">JUSTICE AI</span>
-      <button class="btn-sidebar-collapse" onclick="toggleSidebar()" title="Collapse Sidebar (Fullscreen Chat)" aria-label="Collapse Sidebar">
-        <svg class="sidebar-arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-      </button>
+    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 6px; margin-top: -2px;">
+      <span onclick="showLandingView()" style="font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; color: var(--text-primary); cursor: pointer; user-select: none; text-transform: uppercase; letter-spacing: 0.04em; text-align: center;" title="Return to Overview" id="brandTitle">JUSTICE AI</span>
     </div>
     
     <button class="pill pill-primary" onclick="createNewChat()" id="btnNewQuestion">+ New question</button>
 
-    <!-- Recent Questions List (Dynamically populated per logged-in user) -->
+    <!-- Recent Questions List (Dynamically populated for both guest & logged-in users) -->
     <nav aria-label="Recent questions" style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; overflow-y: auto; overflow-x: hidden;">
-      <div style="font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px; flex-shrink: 0;" id="lblRecent">YOUR RECENT CHATS</div>
+      <div style="font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px; flex-shrink: 0; text-align: center;" id="lblRecent">RECENT CHATS</div>
       <div id="recentListContainer" style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; overflow-y: auto;">
-        <!-- Dynamically rendered per user -->
+        <!-- Dynamically rendered -->
       </div>
     </nav>
 
@@ -1767,67 +2515,78 @@
   </aside>
 
   <!-- Main View Area -->
-  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
+  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden;">
     <!-- Top Filter & Controls Bar -->
     <header class="bar" id="chatHeaderBar">
-      <!-- Single Arrow Sidebar Toggle (Directly beside Region, rolls back sidebar for fullscreen) -->
+      <!-- Single Chevron Arrow Sidebar Toggle (< to close, > to open) -->
       <button class="btn-sidebar-arrow-toggle" onclick="toggleSidebar()" id="btnSidebarToggle" title="Collapse / Expand Sidebar (Fullscreen)" aria-label="Toggle Sidebar">
         <svg id="sidebarArrowIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
+          <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
       </button>
 
-      <!-- 1. Region Selector -->
-      <label class="fld"><span id="lblRegion">Region</span>
-        <span class="sel">
-          <select id="selRegion" onchange="onRegionChange(this.value)">
-            <option value="AUTO" selected>Auto-Detect</option>
-            <option value="IN">India</option>
-            <option value="DE">Germany</option>
-            <option value="CH">Switzerland</option>
-            <option value="GB">United Kingdom</option>
-            <option value="EU">European Union</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-            <option value="AU">Australia</option>
-            <option value="SG">Singapore</option>
-            <option value="GLOBAL">Global / International</option>
-          </select>
-          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
-        </span>
-      </label>
+      <!-- Centered 3 Dropdown Controls -->
+      <div class="bar-center-controls">
+        <!-- 1. Region Selector -->
+        <div class="fld"><span id="lblRegion">Region</span>
+          <span class="sel" id="wrapRegion">
+            <select id="selRegion" onchange="onRegionChange(this.value)">
+              <option value="AUTO" selected>Auto-Detect</option>
+              <option value="IN">India</option>
+              <option value="DE">Germany</option>
+              <option value="CH">Switzerland</option>
+              <option value="GB">United Kingdom</option>
+              <option value="EU">European Union</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+              <option value="AU">Australia</option>
+              <option value="SG">Singapore</option>
+              <option value="GLOBAL">Global / International</option>
+            </select>
+            <button type="button" class="custom-select-btn" id="btnRegionSelect" onclick="toggleCustomSelect('selRegion', this, event)">
+              <span id="txtRegionSelect">Auto-Detect</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </span>
+        </div>
 
-      <!-- 2. Granular Category -->
-      <label class="fld"><span id="lblCategory">Category</span>
-        <span class="sel">
-          <select id="selCategory" onchange="onCategoryChange(this.value)">
-            <option value="AUTO" selected>Auto-Detect Category</option>
-            <option value="Traffic & Motor Vehicles Law">Traffic & Motor Vehicles Law</option>
-            <option value="State Excise & Regulatory Law">State Excise & Regulatory Law</option>
-            <option value="Tenancy: Eviction & Termination Notice">Tenancy: Eviction & Termination Notice</option>
-            <option value="Consumer Protection & Defective Goods">Consumer Protection & Defective Goods</option>
-            <option value="Criminal & Penal Law">Criminal & Penal Law</option>
-            <option value="Employment & Wage Rights">Employment & Wage Rights</option>
-            <option value="Data Privacy & GDPR">Data Privacy & GDPR</option>
-            <option value="Commercial & Contract Disputes">Commercial & Contract Disputes</option>
-            <option value="Family Law & Estate">Family Law & Estate</option>
-          </select>
-          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
-        </span>
-      </label>
+        <!-- 2. Granular Category -->
+        <div class="fld"><span id="lblCategory">Category</span>
+          <span class="sel" id="wrapCategory">
+            <select id="selCategory" onchange="onCategoryChange(this.value)">
+              <option value="AUTO" selected>Auto-Detect Category</option>
+              <option value="Traffic & Motor Vehicles Law">Traffic & Motor Vehicles Law</option>
+              <option value="State Excise & Regulatory Law">State Excise & Regulatory Law</option>
+              <option value="Tenancy: Eviction & Termination Notice">Tenancy: Eviction & Termination Notice</option>
+              <option value="Consumer Protection & Defective Goods">Consumer Protection & Defective Goods</option>
+              <option value="Criminal & Penal Law">Criminal & Penal Law</option>
+              <option value="Employment & Wage Rights">Employment & Wage Rights</option>
+              <option value="Data Privacy & GDPR">Data Privacy & GDPR</option>
+              <option value="Commercial & Contract Disputes">Commercial & Contract Disputes</option>
+              <option value="Family Law & Estate">Family Law & Estate</option>
+            </select>
+            <button type="button" class="custom-select-btn" id="btnCategorySelect" onclick="toggleCustomSelect('selCategory', this, event)">
+              <span id="txtCategorySelect">Auto-Detect Category</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </span>
+        </div>
 
-      <!-- 3. Dynamic Region-Aware Language Selector -->
-      <label class="fld"><span id="lblLanguage">Language</span>
-        <span class="sel">
-          <select id="selLanguage" onchange="changeLanguage(this.value)">
-            <!-- Populated dynamically via JS -->
-          </select>
-          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
-        </span>
-      </label>
+        <!-- 3. Dynamic Region-Aware Language Selector -->
+        <div class="fld"><span id="lblLanguage">Language</span>
+          <span class="sel" id="wrapLanguage">
+            <select id="selLanguage" onchange="changeLanguage(this.value)">
+              <!-- Populated dynamically via JS -->
+            </select>
+            <button type="button" class="custom-select-btn" id="btnLanguageSelect" onclick="toggleCustomSelect('selLanguage', this, event)">
+              <span id="txtLanguageSelect">Auto-Detect Language</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </span>
+        </div>
+      </div>
 
-      <!-- Actions: Sun/Moon Theme Toggle, Share Chat (Desktop View) -->
+      <!-- Actions: Sun/Moon Theme Toggle, Share Chat -->
       <div class="bar-right-actions">
         <button class="theme-toggle-btn" onclick="toggleTheme()" id="btnThemeToggle" title="Toggle Dark / Light Mode" aria-label="Toggle Dark / Light Mode">
           <svg viewBox="0 0 24 24" id="themeIcon" width="18" height="18" style="stroke: currentColor;">
@@ -1843,9 +2602,9 @@
           </svg>
         </button>
 
-        <button class="pill" onclick="shareChat()" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 13px;">
+        <button type="button" class="pill" id="btnShareChat" onclick="toggleShareMenu(this, event)" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 13px; white-space: nowrap; flex-shrink: 0;">
           <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"></path></svg>
-          <span id="lblShare">Share</span>
+          <span id="lblShare">Share chat</span>
         </button>
       </div>
     </header>
@@ -1857,19 +2616,127 @@
       </section>
     </div>
 
-    <!-- Fixed Bottom Input Bar -->
-    <div class="chat-composer-bar" id="chatComposerBar" style="flex: none; padding: 14px 24px 18px; background: var(--bg-main); border-top: 1px solid var(--border-light); z-index: 10;">
-      <div style="display: flex; align-items: center; gap: 10px; max-width: 768px; margin: 0 auto;">
-        <input id="chatInput" placeholder="Ask a legal question in any country or language" style="flex: 1; min-width: 0; box-sizing: border-box; min-height: 48px; padding: 0 20px; border: 1px solid var(--border-input); border-radius: 24px; background: var(--card-bg); font-size: 15px; color: var(--text-primary); outline: none;" onkeydown="if(event.key==='Enter') sendUserQuery()">
-        <button onclick="sendUserQuery()" aria-label="Send" style="flex: none; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--accent-primary); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;">
-          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-        </button>
+    <!-- Fixed Bottom Antigravity-Style Input Bar -->
+    <div class="chat-composer-bar" id="chatComposerBar" style="flex: none; padding: 12px 24px 16px; background: var(--bg-main); border-top: 1px solid var(--border-light); z-index: 10;">
+      <div class="antigravity-composer-box" id="composerBox">
+        <!-- Attachment Preview Strip (Appears when files/images are added) -->
+        <div id="composerAttachmentsStrip" class="composer-attachments-strip" style="display: none;"></div>
+
+        <!-- Top Input Row: Auto-resizing Textarea -->
+        <div style="display: flex; align-items: flex-start; width: 100%;">
+          <textarea id="chatInput" 
+                    class="composer-textarea" 
+                    placeholder="Ask any legal question, paste statutory clauses, or attach documents..." 
+                    rows="1" 
+                    oninput="autoResizeComposerTextarea(this)" 
+                    onkeydown="handleComposerKeydown(event)"></textarea>
+        </div>
+
+        <!-- Bottom Toolbar Row: Antigravity Loadout -->
+        <div class="composer-toolbar">
+          <!-- Left Group: '+' Attachment Menu Button & Engine Selector Pill -->
+          <div class="composer-toolbar-left">
+            <!-- '+' Attachment Menu Container -->
+            <div style="position: relative;">
+              <button type="button" 
+                      class="composer-tool-btn btn-add-attachment" 
+                      id="btnAddAttachment" 
+                      onclick="toggleAttachmentMenu(event)" 
+                      title="Add photo or document">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+              <div class="popover-menu-up" id="attachmentMenu" style="display: none; min-width: 145px;">
+                <button type="button" class="popover-menu-item" onclick="triggerPhotoInput()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <span>Photo</span>
+                </button>
+                <button type="button" class="popover-menu-item" onclick="triggerDocInput()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                  <span>Document</span>
+                </button>
+              </div>
+              <input type="file" id="filePhotoInput" multiple accept="image/*" style="display: none;" onchange="handleFilesSelected(event)">
+              <input type="file" id="fileDocInput" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;" onchange="handleFilesSelected(event)">
+            </div>
+          </div>
+
+          <!-- Right Group: Mic Voice Button & Blue Arrow Submit Button -->
+          <div class="composer-toolbar-right">
+            <!-- Microphone Voice Speech Button (🎙️) -->
+            <button type="button" 
+                    class="composer-tool-btn btn-mic" 
+                    id="btnVoiceMic" 
+                    onclick="toggleVoiceSpeech()" 
+                    title="Dictate legal query in your selected language (Voice Input)">
+              <svg id="micSvgIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
+
+            <!-- Original Blue Arrow Submit Button -->
+            <button type="button" 
+                    class="antigravity-submit-circle" 
+                    id="btnComposerSubmit" 
+                    onclick="sendUserQuery()" 
+                    aria-label="Send"
+                    title="Send legal inquiry (Enter)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-      <div style="max-width: 768px; margin: 8px auto 0; font-size: 12px; color: var(--text-secondary); text-align: center;" id="lblInputFootnote">JUSTICE AI is an artificial intelligence and can make mistakes. Always verify critical statutory details with licensed legal counsel.</div>
+      <div style="max-width: 768px; margin: 8px auto 0; font-size: 11.5px; color: var(--text-secondary); text-align: center;" id="lblInputFootnote">JUSTICE AI is an artificial intelligence grounded in official statutory vectors. Always verify critical statutory details with licensed legal counsel.</div>
     </div>
   </main>
 </div>
 
+<!-- Shared Floating Monocolour Menus (Outside overflow containers) -->
+<div id="customSelectMenu" class="custom-select-menu"></div>
+<div id="shareMenu" class="popover-menu-down">
+  <button type="button" class="popover-menu-item" onclick="exportChatAsPDF()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="16" y1="13" x2="8" y2="13"></line>
+      <line x1="16" y1="17" x2="8" y2="17"></line>
+    </svg>
+    <span>Export as PDF</span>
+  </button>
+  <button type="button" class="popover-menu-item" onclick="exportChatAsTXT()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>Export as TXT</span>
+  </button>
+  <button type="button" class="popover-menu-item" id="btnCopyShareLink" onclick="copyShareLink()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+    </svg>
+    <span>Copy Share Link</span>
+  </button>
+</div>
+
+<div id="toastBanner" class="toast-banner"></div>
 <script>
 // Dynamic Region-to-Language Mapping
 const regionLanguages = {
@@ -1937,7 +2804,7 @@ const i18n = {
   en: {
     brand: "JUSTICE AI",
     new_question: "+ New question",
-    recent: "YOUR RECENT CHATS",
+    recent: "RECENT CHATS",
     verified_coverage: "Verified coverage",
     coverage_list: "India · United Kingdom · European Union · Germany · Switzerland · United States · Canada · Australia · Singapore · Global",
     region: "Region",
@@ -2305,13 +3172,6 @@ async function handleContactSubmit(e) {
   }
 }
 
-function resetGuestConsultation() {
-  guestQueryCount = 0;
-  localStorage.removeItem('justice_ai_guest_count');
-  renderUserProfileBadge();
-  closeAuthModal();
-}
-
 function renderUserProfileBadge() {
   const badgeContainer = document.getElementById('userProfileBadge');
   if (!badgeContainer) return;
@@ -2335,15 +3195,9 @@ function renderUserProfileBadge() {
           <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Guest Consultation</span>
           <span class="mini-tag" style="background: var(--tag-verified-bg); font-size: 11px; padding: 2px 7px;">${left} ${left === 1 ? 'query' : 'queries'} left</span>
         </div>
-        <button class="pill pill-secondary" onclick="openAuthModal('register')" style="font-size: 12px; padding: 6px 10px; width: 100%; justify-content: center;">
+        <button class="pill pill-secondary" onclick="openAuthModal('${left > 0 ? 'signin' : 'register'}')" style="font-size: 12px; padding: 6px 10px; width: 100%; justify-content: center;">
           ${left > 0 ? 'Sign in to save chat' : 'Sign in / Create Account'}
         </button>
-        ${left === 0 ? `
-          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; padding: 0 2px;">
-            <a href="javascript:void(0)" onclick="quickDemoLogin()" style="color: var(--accent-primary); text-decoration: underline;">Demo login</a>
-            <a href="javascript:void(0)" onclick="resetGuestConsultation()" style="color: var(--text-secondary); text-decoration: underline;">Reset guest</a>
-          </div>
-        ` : ''}
       </div>
     `;
   }
@@ -2422,12 +3276,6 @@ async function submitRegister() {
   }
 }
 
-function quickDemoLogin() {
-  document.getElementById('loginUsername').value = 'demo';
-  document.getElementById('loginPassword').value = 'password123';
-  submitSignIn();
-}
-
 async function onAuthSuccess(user, token) {
   currentUser = user;
   authToken = token;
@@ -2476,11 +3324,12 @@ async function onAuthSuccess(user, token) {
   loadUserConversations();
 }
 
-async function verifyExistingSession() {
+async function verifyExistingSession(skipShowLanding = false) {
   renderUserProfileBadge();
 
   if (!authToken) {
-    showLandingView();
+    loadGuestConversations();
+    if (!skipShowLanding) showLandingView();
     return;
   }
 
@@ -2493,13 +3342,14 @@ async function verifyExistingSession() {
       currentUser = data.user;
       isGuest = false;
       renderUserProfileBadge();
-      loadUserConversations();
-      showLandingView();
+      loadUserConversations(skipShowLanding);
+      if (!skipShowLanding) showLandingView();
     } else {
       handleLogout();
     }
   } catch (e) {
-    showLandingView();
+    loadGuestConversations();
+    if (!skipShowLanding) showLandingView();
   }
 }
 
@@ -2520,12 +3370,74 @@ function handleLogout() {
   userConversations = [];
 
   renderUserProfileBadge();
+  loadGuestConversations();
   showLandingView();
 }
 
-// Conversation Management (per user)
-async function loadUserConversations() {
-  if (!authToken) return;
+// Guest Local Conversation Persistence
+function loadGuestConversations() {
+  try {
+    const raw = localStorage.getItem('justice_ai_guest_conversations');
+    userConversations = raw ? JSON.parse(raw) : [];
+  } catch (_) {
+    userConversations = [];
+  }
+  renderRecentConversations();
+}
+
+function saveGuestConversations() {
+  if (currentUser) return;
+  try {
+    // Strip large base64 data URLs before persisting to localStorage to stay under 5MB quota
+    const compact = userConversations.slice(0, 30).map(c => ({
+      ...c,
+      messages: (c.messages || []).filter(m => !m.loading).map(m => ({
+        ...m,
+        attachments: (m.attachments || []).map(a => ({
+          name: a.name,
+          size: a.size,
+          type: a.type,
+          isImage: a.isImage,
+          isPdf: a.isPdf
+        }))
+      }))
+    }));
+    localStorage.setItem('justice_ai_guest_conversations', JSON.stringify(compact));
+  } catch (e) {
+    console.warn('Could not save guest conversations locally:', e);
+  }
+}
+
+function syncActiveConversationToSidebar(firstQueryText, reg, cat) {
+  const cleanTitle = (firstQueryText || 'Legal Consultation').slice(0, 42) + ((firstQueryText || '').length > 42 ? '...' : '');
+  if (!currentConversationId) {
+    currentConversationId = (currentUser ? 'local_' : 'guest_') + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  }
+  let existing = userConversations.find(c => c.id === currentConversationId);
+  if (!existing) {
+    existing = {
+      id: currentConversationId,
+      title: cleanTitle,
+      jurisdiction: reg || 'AUTO',
+      category: cat || 'General',
+      messages: [...chatMessages.filter(m => !m.loading)]
+    };
+    userConversations.unshift(existing);
+  } else {
+    existing.jurisdiction = reg || existing.jurisdiction;
+    existing.category = cat || existing.category;
+    existing.messages = [...chatMessages.filter(m => !m.loading)];
+  }
+  saveGuestConversations();
+  renderRecentConversations();
+}
+
+// Conversation Management (per user & guest)
+async function loadUserConversations(preserveActive = false) {
+  if (!authToken) {
+    loadGuestConversations();
+    return;
+  }
 
   try {
     const res = await fetch('/api/conversations', {
@@ -2533,14 +3445,21 @@ async function loadUserConversations() {
     });
     const data = await res.json();
     if (data.status === 'success') {
-      userConversations = data.conversations || [];
+      const serverConvs = data.conversations || [];
+      // Preserve cached local messages for active conversation if any
+      const prevMap = new Map(userConversations.map(c => [c.id, c.messages]));
+      userConversations = serverConvs.map(c => ({
+        ...c,
+        messages: prevMap.get(c.id) || null
+      }));
       renderRecentConversations();
 
-      // If user has existing conversations and none is loaded, load the most recent
-      if (userConversations.length > 0 && !currentConversationId) {
-        selectConversation(userConversations[0].id);
-      } else if (userConversations.length === 0) {
-        createNewChat();
+      if (!preserveActive) {
+        if (userConversations.length > 0 && !currentConversationId) {
+          selectConversation(userConversations[0].id);
+        } else if (userConversations.length === 0 && chatMessages.length === 0) {
+          createNewChat();
+        }
       }
     }
   } catch (err) {
@@ -2550,10 +3469,11 @@ async function loadUserConversations() {
 
 function renderRecentConversations() {
   const container = document.getElementById('recentListContainer');
+  if (!container) return;
   container.innerHTML = '';
 
   if (userConversations.length === 0) {
-    container.innerHTML = `<div style="font-size:12px;color:var(--text-secondary);padding:10px 4px;">No recent questions yet. Start a new question below.</div>`;
+    container.innerHTML = `<div style="font-size:12px;color:var(--text-secondary);padding:10px 4px;text-align:center;">No recent chats yet. Start a new question below.</div>`;
     return;
   }
 
@@ -2567,7 +3487,7 @@ function renderRecentConversations() {
     };
 
     const titleSpan = document.createElement('span');
-    titleSpan.textContent = c.title;
+    titleSpan.textContent = c.title || 'Legal Consultation';
 
     const subSpan = document.createElement('span');
     subSpan.className = 'recent-sub';
@@ -2596,6 +3516,31 @@ async function selectConversation(convId) {
     toggleSidebar(false);
   }
 
+  const localConv = userConversations.find(c => c.id === convId);
+  // If guest or local-only conversation or we don't have authToken, load from local memory/storage
+  if (!authToken || String(convId).startsWith('guest_') || String(convId).startsWith('local_') || (localConv && localConv.messages && localConv.messages.length)) {
+    if (localConv) {
+      if (localConv.jurisdiction) {
+        document.getElementById('selRegion').value = localConv.jurisdiction;
+        populateLanguageDropdown(localConv.jurisdiction);
+      }
+      if (localConv.category) {
+        document.getElementById('selCategory').value = localConv.category;
+        currentCategory = localConv.category;
+      }
+      syncCustomSelectLabels();
+      chatMessages = [...(localConv.messages || [])];
+      renderChat();
+      if (authToken && !String(convId).startsWith('guest_') && !String(convId).startsWith('local_')) {
+        // Refresh silently from backend if logged in
+      } else {
+        return;
+      }
+    }
+  }
+
+  if (!authToken) return;
+
   try {
     const res = await fetch(`/api/conversations/detail?id=${convId}`, {
       headers: { 'Authorization': `Bearer ${authToken}` }
@@ -2611,6 +3556,7 @@ async function selectConversation(convId) {
         document.getElementById('selCategory').value = conv.category;
         currentCategory = conv.category;
       }
+      syncCustomSelectLabels();
 
       chatMessages = [];
       data.data.messages.forEach(m => {
@@ -2625,7 +3571,8 @@ async function selectConversation(convId) {
               headline: card.headline,
               body: card.body_text,
               sources: card.sources,
-              chips: card.chips
+              chips: card.chips,
+              is_clarification: !!card.is_clarification
             });
           } else {
             chatMessages.push({
@@ -2639,6 +3586,7 @@ async function selectConversation(convId) {
           }
         }
       });
+      if (localConv) localConv.messages = [...chatMessages];
       renderChat();
     }
   } catch (err) {
@@ -2647,17 +3595,103 @@ async function selectConversation(convId) {
 }
 
 function createNewChat() {
+  // Preserve current active conversation messages before switching to blank chat
+  if (currentConversationId && chatMessages.length > 0) {
+    const reg = document.getElementById('selRegion') ? document.getElementById('selRegion').value : 'AUTO';
+    const cat = document.getElementById('selCategory') ? document.getElementById('selCategory').value : currentCategory;
+    const firstUserMsg = chatMessages.find(m => m.role === 'user');
+    syncActiveConversationToSidebar(firstUserMsg ? firstUserMsg.content : 'Legal Consultation', reg, cat);
+  }
   currentConversationId = null;
   chatMessages = [];
-  document.querySelectorAll('.recent-item').forEach(el => el.classList.remove('active'));
+  renderRecentConversations();
   renderChat();
   if (window.innerWidth <= 820) {
     toggleSidebar(false);
   }
 }
 
-async function deleteUserConversation(convId) {
-  if (!confirm('Are you sure you want to delete this conversation?')) return;
+let pendingDeleteConvId = null;
+
+function openDeleteConfirmModal(convId) {
+  pendingDeleteConvId = convId;
+  const modal = document.getElementById('deleteConfirmModal');
+  const titleEl = document.getElementById('deleteConfirmTitle');
+  const descEl = document.getElementById('deleteConfirmDesc');
+  const cancelBtn = document.getElementById('btnCancelDelete');
+  const delBtn = document.getElementById('btnConfirmDelete');
+
+  if (!modal) return;
+  const isHi = currentLang === 'hi';
+  const isDe = currentLang === 'de';
+  if (titleEl) {
+    titleEl.textContent = isHi ? 'चैट हटाएँ?' : (isDe ? 'Beratung löschen?' : 'Delete consultation?');
+  }
+  if (descEl) {
+    descEl.textContent = isHi
+      ? 'यह चैट और इसके सभी संदेश आपके इतिहास से स्थायी रूप से हट जाएँगे।'
+      : (isDe
+        ? 'Dieser Chat und alle Nachrichten werden dauerhaft aus Ihrem Verlauf entfernt.'
+        : 'This chat and its messages will be permanently removed from your history.');
+  }
+  if (cancelBtn) cancelBtn.textContent = isHi ? 'रद्द करें' : (isDe ? 'Abbrechen' : 'Cancel');
+  if (delBtn) {
+    delBtn.disabled = false;
+    delBtn.textContent = isHi ? 'हटाएँ' : (isDe ? 'Löschen' : 'Delete');
+  }
+
+  modal.style.display = 'flex';
+  if (cancelBtn) setTimeout(() => cancelBtn.focus(), 20);
+}
+
+function closeDeleteConfirmModal() {
+  pendingDeleteConvId = null;
+  const modal = document.getElementById('deleteConfirmModal');
+  if (modal) modal.style.display = 'none';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('deleteConfirmModal');
+    if (modal && modal.style.display !== 'none') {
+      closeDeleteConfirmModal();
+    }
+  }
+});
+
+async function confirmPendingDeleteConversation() {
+  const convId = pendingDeleteConvId;
+  if (!convId) return;
+
+  const delBtn = document.getElementById('btnConfirmDelete');
+  if (delBtn) {
+    delBtn.disabled = true;
+    delBtn.textContent = currentLang === 'hi' ? 'हटाया जा रहा है...' : (currentLang === 'de' ? 'Wird gelöscht...' : 'Deleting...');
+  }
+
+  try {
+    await executeDeleteUserConversation(convId);
+  } finally {
+    closeDeleteConfirmModal();
+  }
+}
+
+function deleteUserConversation(convId) {
+  openDeleteConfirmModal(convId);
+}
+
+async function executeDeleteUserConversation(convId) {
+  if (!authToken || String(convId).startsWith('guest_') || String(convId).startsWith('local_')) {
+    userConversations = userConversations.filter(c => c.id !== convId);
+    saveGuestConversations();
+    if (currentConversationId === convId) {
+      currentConversationId = null;
+      chatMessages = [];
+      renderChat();
+    }
+    renderRecentConversations();
+    return;
+  }
   try {
     const res = await fetch('/api/conversations/delete', {
       method: 'POST',
@@ -2671,13 +3705,101 @@ async function deleteUserConversation(convId) {
     if (data.status === 'success') {
       userConversations = userConversations.filter(c => c.id !== convId);
       if (currentConversationId === convId) {
-        createNewChat();
-      } else {
-        renderRecentConversations();
+        currentConversationId = null;
+        chatMessages = [];
+        renderChat();
       }
+      renderRecentConversations();
     }
   } catch (err) {
     console.error('Delete error', err);
+  }
+}
+
+// Custom Monocolour Dropdown Logic (Single Down-Facing Chevron, Zero Native Select Arrow, Zero Blue)
+let activeCustomSelectId = null;
+
+function syncCustomSelectLabels() {
+  const pairs = [
+    ['selRegion', 'txtRegionSelect'],
+    ['selCategory', 'txtCategorySelect'],
+    ['selLanguage', 'txtLanguageSelect']
+  ];
+  pairs.forEach(([selId, txtId]) => {
+    const sel = document.getElementById(selId);
+    const txt = document.getElementById(txtId);
+    if (sel && txt && sel.options.length > 0) {
+      const opt = sel.options[sel.selectedIndex] || sel.options[0];
+      txt.textContent = opt ? opt.textContent : '';
+    }
+  });
+}
+
+function toggleCustomSelect(selectId, btnEl, event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById('customSelectMenu');
+  const sel = document.getElementById(selectId);
+  if (!menu || !sel) return;
+
+  // Close other popovers
+  closeAllPopoversExcept('customSelectMenu');
+
+  const wrap = btnEl.closest('.sel');
+  if (activeCustomSelectId === selectId && menu.style.display === 'flex') {
+    menu.style.display = 'none';
+    if (wrap) wrap.classList.remove('open');
+    activeCustomSelectId = null;
+    return;
+  }
+
+  document.querySelectorAll('.bar .sel').forEach(s => s.classList.remove('open'));
+  if (wrap) wrap.classList.add('open');
+  activeCustomSelectId = selectId;
+
+  menu.innerHTML = '';
+  Array.from(sel.options).forEach(opt => {
+    const item = document.createElement('div');
+    item.className = 'custom-select-option' + (opt.value === sel.value ? ' selected' : '');
+    item.innerHTML = `<span>${opt.textContent}</span>${opt.value === sel.value ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}`;
+    item.onclick = (e) => {
+      e.stopPropagation();
+      sel.value = opt.value;
+      syncCustomSelectLabels();
+      menu.style.display = 'none';
+      if (wrap) wrap.classList.remove('open');
+      activeCustomSelectId = null;
+      if (sel.onchange) sel.onchange({ target: sel });
+    };
+    menu.appendChild(item);
+  });
+
+  const rect = btnEl.getBoundingClientRect();
+  menu.style.display = 'flex';
+  menu.style.minWidth = Math.min(rect.width, window.innerWidth - 24) + 'px';
+  const menuWidth = Math.min(Math.max(rect.width, menu.offsetWidth || 210), window.innerWidth - 24);
+  let leftPos = rect.left;
+  if (leftPos + menuWidth > window.innerWidth - 12) {
+    leftPos = window.innerWidth - menuWidth - 12;
+  }
+  const topPos = Math.min(rect.bottom + 6, Math.max(12, window.innerHeight - Math.min(menu.offsetHeight || 220, window.innerHeight * 0.6) - 12));
+  menu.style.top = topPos + 'px';
+  menu.style.left = Math.max(12, leftPos) + 'px';
+}
+
+function closeAllPopoversExcept(keepId) {
+  if (keepId !== 'customSelectMenu') {
+    const cm = document.getElementById('customSelectMenu');
+    if (cm) cm.style.display = 'none';
+    document.querySelectorAll('.bar .sel').forEach(s => s.classList.remove('open'));
+    activeCustomSelectId = null;
+  }
+  if (keepId !== 'attachmentMenu') {
+    const am = document.getElementById('attachmentMenu');
+    if (am) am.style.display = 'none';
+  }
+  if (keepId !== 'shareMenu') {
+    const sm = document.getElementById('shareMenu');
+    if (sm) sm.style.display = 'none';
   }
 }
 
@@ -2711,20 +3833,19 @@ function populateLanguageDropdown(region) {
     opt.textContent = l.name;
     sel.appendChild(opt);
   });
+  syncCustomSelectLabels();
 }
 
 function toggleTheme() {
   isDarkTheme = !isDarkTheme;
   document.body.classList.toggle('dark-theme', isDarkTheme);
   const icon = document.getElementById('themeIcon');
-  const iconAuth = document.getElementById('themeIconAuth');
   const iconLanding = document.getElementById('themeIconLanding');
   const iconSidebar = document.getElementById('themeIconSidebar');
   const moonPath = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>';
   const sunPath = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>';
 
   if (icon) icon.innerHTML = isDarkTheme ? moonPath : sunPath;
-  if (iconAuth) iconAuth.innerHTML = isDarkTheme ? moonPath : sunPath;
   if (iconLanding) iconLanding.innerHTML = isDarkTheme ? moonPath : sunPath;
   if (iconSidebar) iconSidebar.innerHTML = isDarkTheme ? moonPath : sunPath;
 }
@@ -2746,6 +3867,360 @@ function changeLanguage(lang) {
   document.getElementById('lblInputFootnote').textContent = t.footnote;
 
   renderChat();
+}
+
+// Multimodal Attachments & Voice State
+let pendingAttachments = [];
+let isRecordingVoice = false;
+let speechRecognizer = null;
+let currentUtterance = null;
+let activeSpeakerBtn = null;
+
+function autoResizeComposerTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  updateSubmitButtonIcon();
+}
+
+function handleComposerKeydown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendUserQuery();
+  }
+}
+
+function updateSubmitButtonIcon() {
+  const btn = document.getElementById('btnComposerSubmit');
+  if (!btn) return;
+  btn.setAttribute('title', 'Send legal inquiry (Enter)');
+}
+
+// Close all menus on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#attachmentMenu') &&
+      !e.target.closest('#btnAddAttachment') &&
+      !e.target.closest('#shareMenu') &&
+      !e.target.closest('#btnShareChat') &&
+      !e.target.closest('#customSelectMenu') &&
+      !e.target.closest('.custom-select-btn')) {
+    closeAllPopoversExcept(null);
+  }
+});
+
+// '+' Attachment Popover Menu (Photo / Document)
+function toggleAttachmentMenu(e) {
+  if (e) e.stopPropagation();
+  closeAllPopoversExcept('attachmentMenu');
+  const menu = document.getElementById('attachmentMenu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+}
+
+function triggerPhotoInput() {
+  closeAllPopoversExcept(null);
+  const input = document.getElementById('filePhotoInput');
+  if (input) input.click();
+}
+
+function triggerDocInput() {
+  closeAllPopoversExcept(null);
+  const input = document.getElementById('fileDocInput');
+  if (input) input.click();
+}
+
+function handleFilesSelected(e) {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  processFiles(files);
+  e.target.value = '';
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function processFiles(files) {
+  files.forEach(file => {
+    if (file.size > 15 * 1024 * 1024) {
+      alert(`File "${file.name}" exceeds the 15MB limit.`);
+      return;
+    }
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const isText = file.type.startsWith('text/') || file.name.toLowerCase().endsWith('.txt');
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      pendingAttachments.push({
+        name: file.name,
+        size: formatFileSize(file.size),
+        type: file.type || (isPdf ? 'application/pdf' : 'application/octet-stream'),
+        data: evt.target.result,
+        isImage: isImage,
+        isPdf: isPdf,
+        isText: isText
+      });
+      renderAttachmentStrip();
+      updateSubmitButtonIcon();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeAttachment(index) {
+  pendingAttachments.splice(index, 1);
+  renderAttachmentStrip();
+  updateSubmitButtonIcon();
+}
+
+function renderAttachmentStrip() {
+  const strip = document.getElementById('composerAttachmentsStrip');
+  if (!strip) return;
+  if (!pendingAttachments.length) {
+    strip.style.display = 'none';
+    strip.innerHTML = '';
+    return;
+  }
+  strip.style.display = 'flex';
+  strip.innerHTML = pendingAttachments.map((att, i) => `
+    <div class="attachment-chip">
+      ${att.isImage ? `<img src="${att.data}" alt="${att.name}">` : `
+        <div class="attachment-chip-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+      `}
+      <span class="attachment-chip-name" title="${att.name}">${att.name} (${att.size})</span>
+      <button type="button" class="attachment-chip-remove" onclick="removeAttachment(${i})" title="Remove attachment">&times;</button>
+    </div>
+  `).join('');
+}
+
+// Voice Speech (Speech-to-Text Dictation)
+function toggleVoiceSpeech() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Speech recognition is supported natively in Chrome, Edge, Safari, and mobile browsers.");
+    return;
+  }
+
+  const micBtn = document.getElementById('btnVoiceMic');
+  const input = document.getElementById('chatInput');
+
+  if (isRecordingVoice) {
+    if (speechRecognizer) {
+      speechRecognizer.stop();
+    }
+    isRecordingVoice = false;
+    if (micBtn) micBtn.classList.remove('recording');
+    return;
+  }
+
+  try {
+    speechRecognizer = new SpeechRecognition();
+    speechRecognizer.continuous = true;
+    speechRecognizer.interimResults = true;
+
+    // Map language code to BCP-47 for speech engine
+    if (currentLang === 'hi') speechRecognizer.lang = 'hi-IN';
+    else if (currentLang === 'de') speechRecognizer.lang = 'de-DE';
+    else if (currentLang === 'fr') speechRecognizer.lang = 'fr-FR';
+    else if (currentLang === 'pa') speechRecognizer.lang = 'pa-IN';
+    else if (currentLang === 'bn') speechRecognizer.lang = 'bn-IN';
+    else if (currentLang === 'ta') speechRecognizer.lang = 'ta-IN';
+    else if (currentLang === 'te') speechRecognizer.lang = 'te-IN';
+    else if (currentLang === 'mr') speechRecognizer.lang = 'mr-IN';
+    else if (currentLang === 'gu') speechRecognizer.lang = 'gu-IN';
+    else speechRecognizer.lang = 'en-US';
+
+    speechRecognizer.onstart = () => {
+      isRecordingVoice = true;
+      if (micBtn) {
+        micBtn.classList.add('recording');
+        micBtn.setAttribute('title', 'Listening... click to stop recording');
+      }
+    };
+
+    speechRecognizer.onresult = (evt) => {
+      let finalTranscript = '';
+      for (let i = evt.resultIndex; i < evt.results.length; ++i) {
+        if (evt.results[i].isFinal) {
+          finalTranscript += evt.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        input.value = (input.value ? input.value + ' ' : '') + finalTranscript.trim();
+        autoResizeComposerTextarea(input);
+      }
+    };
+
+    speechRecognizer.onerror = (e) => {
+      console.warn("Speech recognition notice:", e.error);
+      isRecordingVoice = false;
+      if (micBtn) micBtn.classList.remove('recording');
+    };
+
+    speechRecognizer.onend = () => {
+      isRecordingVoice = false;
+      if (micBtn) {
+        micBtn.classList.remove('recording');
+        micBtn.setAttribute('title', 'Dictate legal query in your selected language (Voice Input)');
+      }
+    };
+
+    speechRecognizer.start();
+  } catch (err) {
+    console.error("Speech init error:", err);
+    isRecordingVoice = false;
+    if (micBtn) micBtn.classList.remove('recording');
+  }
+}
+
+// Text-to-Speech (Audio Readout on Response Cards)
+function toggleAudioSpeech(msgIdx, btn) {
+  if (!('speechSynthesis' in window)) {
+    alert("Audio speech synthesis is not supported in this browser.");
+    return;
+  }
+
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    if (activeSpeakerBtn) {
+      activeSpeakerBtn.classList.remove('speaking');
+      const txtSpan = activeSpeakerBtn.querySelector('.btn-text');
+      if (txtSpan) txtSpan.textContent = 'Listen';
+    }
+    if (activeSpeakerBtn === btn) {
+      activeSpeakerBtn = null;
+      return;
+    }
+  }
+
+  const msg = chatMessages[msgIdx];
+  if (!msg) return;
+
+  const textToRead = `${msg.headline || ''}. ${msg.body || ''}`;
+  const utterance = new SpeechSynthesisUtterance(textToRead);
+
+  // Match voice to current language
+  const voices = window.speechSynthesis.getVoices();
+  const langKey = currentLang === 'hi' ? 'hi' : (currentLang || 'en');
+  const matched = voices.find(v => v.lang.toLowerCase().startsWith(langKey));
+  if (matched) utterance.voice = matched;
+  utterance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+  utterance.rate = 0.98;
+
+  btn.classList.add('speaking');
+  const txtSpan = btn.querySelector('.btn-text');
+  if (txtSpan) txtSpan.textContent = 'Stop';
+  activeSpeakerBtn = btn;
+
+  utterance.onend = () => {
+    btn.classList.remove('speaking');
+    if (txtSpan) txtSpan.textContent = 'Listen';
+    activeSpeakerBtn = null;
+  };
+
+  utterance.onerror = () => {
+    btn.classList.remove('speaking');
+    if (txtSpan) txtSpan.textContent = 'Listen';
+    activeSpeakerBtn = null;
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function copyCardText(btn, msgIdx) {
+  const msg = chatMessages[msgIdx];
+  if (!msg) return;
+  const fullText = `[JUSTICE AI LEGAL ASSESSMENT]\n\n${msg.headline}\n\n${msg.body}\n\nGoverning Framework: ${msg.tag || 'Official Codes'}`;
+  navigator.clipboard.writeText(fullText).then(() => {
+    const span = btn.querySelector('span');
+    const orig = span ? span.textContent : 'Copy';
+    if (span) span.textContent = 'Copied!';
+    setTimeout(() => { if (span) span.textContent = orig; }, 2000);
+  });
+}
+
+function formatLegalMarkdown(raw) {
+  if (!raw) return '';
+  // Escape HTML first to prevent any XSS
+  let s = String(raw)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Remove horizontal rule clutter like --- or ***
+  s = s.replace(/^\s*[-*_]{3,}\s*$/gm, '');
+
+  const lines = s.split(/\r?\n/);
+  let html = '';
+  let listType = null; // 'ul' | 'ol' | null
+
+  function closeList() {
+    if (listType) {
+      html += `</${listType}>`;
+      listType = null;
+    }
+  }
+
+  function formatInline(txt) {
+    return txt
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      closeList();
+      continue;
+    }
+
+    // Markdown headings (### Heading or **Heading**)
+    const headingMatch = line.match(/^#{1,4}\s+(.+)$/);
+    if (headingMatch) {
+      closeList();
+      html += `<div class="legal-h">${formatInline(headingMatch[1])}</div>`;
+      continue;
+    }
+
+    // Bullet item (- , * , • )
+    const ulMatch = line.match(/^(?:[-*•])\s+(.+)$/);
+    if (ulMatch) {
+      if (listType !== 'ul') {
+        closeList();
+        html += '<ul>';
+        listType = 'ul';
+      }
+      html += `<li>${formatInline(ulMatch[1])}</li>`;
+      continue;
+    }
+
+    // Numbered item (1. , 2. )
+    const olMatch = line.match(/^\d+[.)]\s+(.+)$/);
+    if (olMatch) {
+      if (listType !== 'ol') {
+        closeList();
+        html += '<ol>';
+        listType = 'ol';
+      }
+      html += `<li>${formatInline(olMatch[1])}</li>`;
+      continue;
+    }
+
+    // Normal paragraph
+    closeList();
+    html += `<p>${formatInline(line)}</p>`;
+  }
+
+  closeList();
+  return html;
 }
 
 function renderChat() {
@@ -2794,110 +4269,161 @@ function renderChat() {
       loadDiv.style.fontSize = '14px';
       loadDiv.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
-        <span>${currentLang === 'hi' ? 'वैधानिक धाराओं और संहिताओं का विश्लेषण हो रहा है...' : 'Analyzing statutory codes and precedents...'}</span>
+        <span>${currentLang === 'hi' ? 'वैधानिक धाराओं और संहिताओं का विश्लेषण हो रहा है...' : 'Analyzing statutory codes, precedents, and attached documents...'}</span>
       `;
       feed.appendChild(loadDiv);
       return;
     }
     if (msg.role === 'user') {
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-user-bubble';
-      bubble.textContent = msg.content;
-      feed.appendChild(bubble);
+      const bubbleContainer = document.createElement('div');
+      bubbleContainer.style.display = 'flex';
+      bubbleContainer.style.flexDirection = 'column';
+      bubbleContainer.style.alignItems = 'flex-end';
+      bubbleContainer.style.gap = '6px';
+      bubbleContainer.style.maxWidth = '100%';
+
+      if (msg.attachments && msg.attachments.length) {
+        const attRow = document.createElement('div');
+        attRow.style.display = 'flex';
+        attRow.style.flexWrap = 'wrap';
+        attRow.style.gap = '6px';
+        attRow.style.justifyContent = 'flex-end';
+        msg.attachments.forEach(att => {
+          if (att.isImage && att.data) {
+            attRow.innerHTML += `
+              <div class="user-att-preview" style="border-radius: 10px; overflow: hidden; border: 1px solid var(--border-light); max-width: 140px; max-height: 140px; cursor: pointer;" onclick="window.open('${att.data}', '_blank')">
+                <img src="${att.data}" alt="${att.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+              </div>
+            `;
+          } else {
+            attRow.innerHTML += `
+              <div class="user-att-chip" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; background: var(--card-bg); border: 1px solid var(--border-light); font-size: 12px; color: var(--text-primary);">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>${att.name}</span>
+              </div>
+            `;
+          }
+        });
+        bubbleContainer.appendChild(attRow);
+      }
+
+      if (msg.content) {
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-user-bubble';
+        bubble.textContent = msg.content;
+        bubbleContainer.appendChild(bubble);
+      }
+
+      feed.appendChild(bubbleContainer);
     } else {
       const art = document.createElement('article');
-      art.style.display = 'flex';
-      art.style.flexDirection = 'column';
-      art.style.gap = '16px';
+      art.className = 'assistant-response-card';
 
-      // Badges
+      // 1. Top Metadata Strip (Jurisdiction · Category + Official Tag when applicable)
       const badges = document.createElement('div');
       badges.style.display = 'flex';
       badges.style.flexWrap = 'wrap';
-      badges.style.gap = '8px';
-      badges.innerHTML = `
-        <span class="tag tag-jur">${msg.tag || 'Global · General Law'}</span>
-        <span class="tag tag-ver">
-          <svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"></path></svg>
-          ${t.answered_official}
-        </span>
-      `;
+      badges.style.alignItems = 'center';
+      badges.style.gap = '6px';
+      badges.innerHTML = msg.is_clarification
+        ? `<span class="tag tag-jur">${msg.tag || 'Location Needed'}</span>`
+        : `
+          <span class="tag tag-jur">${msg.tag || 'Global · General Law'}</span>
+          <span class="tag tag-ver">
+            <svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"></path></svg>
+            ${t.answered_official}
+          </span>
+        `;
       art.appendChild(badges);
 
-      // Headline
+      // 2. Concise Key Takeaway Headline
       const hl = document.createElement('div');
       hl.style.fontFamily = "'Newsreader', 'Noto Serif Devanagari', serif";
-      hl.style.fontSize = '22px';
-      hl.style.fontWeight = '500';
+      hl.style.fontSize = '20px';
+      hl.style.fontWeight = '600';
       hl.style.lineHeight = '1.35';
       hl.style.color = 'var(--text-primary)';
       hl.textContent = msg.headline;
       art.appendChild(hl);
 
-      // Body text
-      const p = document.createElement('p');
-      p.style.margin = '0';
-      p.style.fontSize = '15px';
-      p.style.lineHeight = '1.65';
-      p.style.color = 'var(--text-body)';
-      p.textContent = msg.body;
-      art.appendChild(p);
+      // 3. Cleanly Formatted Structured Legal Body (No raw ** or ### wall of text)
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'legal-body';
+      bodyDiv.innerHTML = formatLegalMarkdown(msg.body);
+      art.appendChild(bodyDiv);
 
-      // Sources
-      if (msg.sources && msg.sources.length) {
+      // 4. Compact Official Sources Pills (direct links to official statutes/articles)
+      const validSources = (msg.sources || []).filter(s => s && s.url && /^https?:\/\//i.test(s.url));
+      if (validSources.length) {
         const sBox = document.createElement('div');
         sBox.style.display = 'flex';
         sBox.style.flexDirection = 'column';
-        sBox.style.gap = '8px';
-        sBox.innerHTML = `<div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-secondary);font-weight:600;">${t.sources}</div>`;
-        msg.sources.forEach(s => {
-          sBox.innerHTML += `
-            <a class="source-card" href="${s.url}" target="_blank">
-              ${s.title}
-              <span class="source-domain">${s.domain}</span>
-            </a>
-          `;
+        sBox.style.gap = '6px';
+        const sLabel = document.createElement('div');
+        sLabel.style.cssText = 'font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-secondary);font-weight:600;';
+        sLabel.textContent = currentLang === 'en' ? 'OFFICIAL SOURCES' : (t.sources || 'OFFICIAL SOURCES');
+        sBox.appendChild(sLabel);
+        const pillsRow = document.createElement('div');
+        pillsRow.className = 'legal-sources-row';
+        validSources.forEach(s => {
+          const a = document.createElement('a');
+          a.className = 'source-pill';
+          a.href = s.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          const titleSpan = document.createElement('span');
+          titleSpan.textContent = s.title || s.domain || 'Official Statute';
+          const domSpan = document.createElement('span');
+          domSpan.className = 'source-pill-domain';
+          domSpan.textContent = `${s.domain || ''} ↗`.trim();
+          a.appendChild(titleSpan);
+          a.appendChild(domSpan);
+          pillsRow.appendChild(a);
         });
+        sBox.appendChild(pillsRow);
         art.appendChild(sBox);
       }
 
-      // Confidence Meter
-      const conf = document.createElement('div');
-      conf.style.display = 'flex';
-      conf.style.alignItems = 'center';
-      conf.style.gap = '10px';
-      conf.style.fontSize = '13px';
-      conf.style.color = 'var(--text-secondary)';
-      conf.innerHTML = `
-        ${t.confidence}
-        <span style="width:96px;height:6px;border-radius:3px;background:var(--border-light);display:inline-block;overflow:hidden;">
-          <span class="confidence-bar-inner" style="display:block;width:88%;height:6px;border-radius:3px;background:var(--tag-verified-text);"></span>
-        </span>
-        <strong style="font-weight:600;color:var(--text-primary);">${t.conf_high}</strong>
+      // 5. Compact Utility Bar (Listen + Copy)
+      const utilityBar = document.createElement('div');
+      utilityBar.className = 'card-utility-bar';
+      utilityBar.innerHTML = `
+        <button type="button" class="action-btn-pill btn-audio-listen" onclick="toggleAudioSpeech(${idx}, this)" title="Listen to legal breakdown (Speech Output)">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" class="speaker-icon">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <span class="btn-text">Listen</span>
+        </button>
+        <button type="button" class="action-btn-pill" onclick="copyCardText(this, ${idx})" title="Copy legal advisory to clipboard">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>Copy</span>
+        </button>
       `;
-      art.appendChild(conf);
+      art.appendChild(utilityBar);
 
-      // Disclaimer box
+      // 6. Subtle Muted Legal Note (replaces bulky yellow box)
       const disc = document.createElement('div');
-      disc.style.padding = '12px 16px';
-      disc.style.border = '1px solid var(--disclaimer-border)';
-      disc.style.borderRadius = '12px';
-      disc.style.background = 'var(--disclaimer-bg)';
-      disc.style.color = 'var(--disclaimer-text)';
-      disc.style.fontSize = '13px';
-      disc.style.lineHeight = '1.5';
+      disc.className = 'card-disclaimer-note';
       disc.textContent = t.disclaimer;
       art.appendChild(disc);
 
-      // Chips
+      // 7. Follow-up Chips
       if (msg.chips && msg.chips.length && idx === chatMessages.length - 1) {
         const chipContainer = document.createElement('div');
         chipContainer.style.display = 'flex';
         chipContainer.style.flexWrap = 'wrap';
-        chipContainer.style.gap = '8px';
+        chipContainer.style.gap = '6px';
         msg.chips.forEach(c => {
           const btn = document.createElement('button');
           btn.className = 'chip';
+          btn.style.minHeight = '32px';
+          btn.style.fontSize = '12.5px';
+          btn.style.margin = '0';
           btn.textContent = c;
           btn.onclick = () => submitQuery(c);
           chipContainer.appendChild(btn);
@@ -2915,13 +4441,24 @@ function renderChat() {
 
 function sendUserQuery() {
   const inp = document.getElementById('chatInput');
-  const val = inp.value.trim();
-  if (!val) return;
-  inp.value = '';
-  submitQuery(val);
+  const val = inp ? inp.value.trim() : '';
+  if (!val && pendingAttachments.length === 0) return;
+
+  const queryText = val || (pendingAttachments.length > 0 ? `Analyze attached legal document: ${pendingAttachments.map(a => a.name).join(', ')}` : '');
+  const attachmentsToSend = [...pendingAttachments];
+
+  if (inp) {
+    inp.value = '';
+    autoResizeComposerTextarea(inp);
+  }
+  pendingAttachments = [];
+  renderAttachmentStrip();
+  updateSubmitButtonIcon();
+
+  submitQuery(queryText, attachmentsToSend);
 }
 
-function submitQuery(q) {
+function submitQuery(q, attachments = []) {
   if (!currentUser) {
     if (guestQueryCount >= 3) {
       openAuthModal('register', 'You have completed your 3 free guest consultations. Create a free account or sign in to permanently save your conversation, unlock unlimited queries, and export legal dossiers.');
@@ -2932,19 +4469,37 @@ function submitQuery(q) {
     renderUserProfileBadge();
   }
 
-  chatMessages.push({ role: 'user', content: q });
-  chatMessages.push({ role: 'assistant', loading: true });
-  renderChat();
-
   const isHi = currentLang === 'hi';
   const reg = document.getElementById('selRegion').value;
   const cat = document.getElementById('selCategory').value || currentCategory;
 
+  const priorHistory = chatMessages
+    .filter(m => !m.loading)
+    .slice(-6)
+    .map(m => ({
+      role: m.role,
+      content: m.role === 'user' ? (m.content || '') : (m.headline || m.body || ''),
+      is_clarification: !!m.is_clarification
+    }));
+
+  chatMessages.push({ role: 'user', content: q, attachments: attachments });
+  // Immediately register conversation in Recent Chats panel so user sees it right away
+  syncActiveConversationToSidebar(q, reg, cat);
+
+  chatMessages.push({ role: 'assistant', loading: true });
+  renderChat();
+
   function handleSuccess(data) {
     chatMessages = chatMessages.filter(m => !m.loading);
     if (data.status === 'success' && data.card) {
+      const oldConvId = currentConversationId;
       if (data.conversation_id && !data.is_guest) {
         currentConversationId = data.conversation_id;
+        // Migrate temporary local entry ID to server conversation_id
+        if (oldConvId && oldConvId !== currentConversationId) {
+          const entry = userConversations.find(c => c.id === oldConvId);
+          if (entry) entry.id = currentConversationId;
+        }
       }
       chatMessages.push({
         role: 'assistant',
@@ -2952,8 +4507,10 @@ function submitQuery(q) {
         headline: data.card.headline,
         body: data.card.body_text,
         sources: data.card.sources,
-        chips: data.card.chips
+        chips: data.card.chips,
+        is_clarification: !!data.card.is_clarification
       });
+      syncActiveConversationToSidebar(q, data.jurisdiction || reg, data.category || cat);
       if (!currentUser) {
         guestTurns.push({
           query: q,
@@ -2962,10 +4519,11 @@ function submitQuery(q) {
           category: data.category || cat
         });
       } else {
-        loadUserConversations();
+        loadUserConversations(true);
       }
     } else {
       fallbackHeuristic(q, reg, cat, isHi);
+      syncActiveConversationToSidebar(q, reg, cat);
     }
     renderChat();
   }
@@ -2973,6 +4531,8 @@ function submitQuery(q) {
   function handleFallback() {
     chatMessages = chatMessages.filter(m => !m.loading);
     fallbackHeuristic(q, reg, cat, isHi);
+    syncActiveConversationToSidebar(q, reg, cat);
+    renderChat();
   }
 
   const payload = {
@@ -2980,7 +4540,9 @@ function submitQuery(q) {
     jurisdiction: reg,
     category: cat,
     language: currentLang,
-    conversation_id: currentConversationId
+    history: priorHistory,
+    attachments: attachments,
+    conversation_id: (currentConversationId && !String(currentConversationId).startsWith('guest_') && !String(currentConversationId).startsWith('local_')) ? currentConversationId : null
   };
 
   const headers = {
@@ -3032,7 +4594,33 @@ function fallbackHeuristic(q, reg, cat, isHi) {
   renderChat();
 }
 
-function shareChat() {
+// Share Chat Dropdown & Export Actions (PDF, TXT, Shareable Link)
+function toggleShareMenu(btnEl, event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById('shareMenu');
+  if (!menu) return;
+
+  const isVisible = menu.style.display === 'flex';
+  closeAllPopoversExcept('shareMenu');
+  if (isVisible) {
+    menu.style.display = 'none';
+    return;
+  }
+
+  const rect = btnEl.getBoundingClientRect();
+  menu.style.display = 'flex';
+  const menuWidth = Math.min(menu.offsetWidth || 215, window.innerWidth - 24);
+  const rightAlign = Math.min(window.innerWidth - menuWidth - 12, Math.max(12, rect.right - menuWidth));
+  menu.style.top = (rect.bottom + 8) + 'px';
+  menu.style.left = rightAlign + 'px';
+}
+
+function exportChatAsTXT() {
+  closeAllPopoversExcept(null);
+  if (!chatMessages.length) {
+    alert('Start a conversation first before exporting.');
+    return;
+  }
   let transcript = "=== JUSTICE AI CASE TRANSCRIPT ===\n";
   if (currentUser) {
     transcript += `User: ${currentUser.name} (@${currentUser.username})\n`;
@@ -3040,19 +4628,248 @@ function shareChat() {
   transcript += `Date: ${new Date().toLocaleString()}\n\n`;
 
   chatMessages.forEach(m => {
+    if (m.loading) return;
     transcript += `[${m.role.toUpperCase()}]: ${m.content || m.headline}\n${m.body || ''}\n\n`;
   });
-  const blob = new Blob([transcript], { type: 'text/plain' });
+  const blob = new Blob([transcript], { type: 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `JusticeAI_${currentUser ? currentUser.username : 'Case'}_Transcript.txt`;
   a.click();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function exportChatAsPDF() {
+  closeAllPopoversExcept(null);
+  if (!chatMessages.length) {
+    alert('Start a conversation first before exporting as PDF.');
+    return;
+  }
+  const reg = document.getElementById('selRegion') ? document.getElementById('selRegion').value : 'AUTO';
+  const cat = document.getElementById('selCategory') ? document.getElementById('selCategory').value : currentCategory;
+
+  let turnsHtml = '';
+  chatMessages.forEach(m => {
+    if (m.loading) return;
+    if (m.role === 'user') {
+      turnsHtml += `
+        <div style="margin: 18px 0 10px; padding: 12px 16px; background: #F3F4F6; border-radius: 10px; border-left: 3px solid #1A1F2B;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #5B6270; margin-bottom: 4px;">Question</div>
+          <div style="font-size: 14px; color: #111827;">${(m.content || '').replace(/</g, '&lt;')}</div>
+        </div>
+      `;
+    } else {
+      let sourcesHtml = '';
+      if (m.sources && m.sources.length) {
+        sourcesHtml = '<div style="margin-top: 10px; font-size: 12px; color: #4B5563;"><strong>Sources:</strong> ' +
+          m.sources.map(s => `${s.title} (${s.domain})`).join(' · ') + '</div>';
+      }
+      turnsHtml += `
+        <div style="margin: 10px 0 22px; padding-bottom: 16px; border-bottom: 1px solid #E5E7EB;">
+          <div style="font-size: 11px; color: #6B7280; margin-bottom: 4px;">${m.tag || `${reg} · ${cat}`}</div>
+          <h2 style="font-family: Georgia, serif; font-size: 18px; margin: 0 0 8px; color: #111827;">${(m.headline || '').replace(/</g, '&lt;')}</h2>
+          <p style="font-size: 14px; line-height: 1.6; color: #1F2937; margin: 0; white-space: pre-wrap;">${(m.body || '').replace(/</g, '&lt;')}</p>
+          ${sourcesHtml}
+        </div>
+      `;
+    }
+  });
+
+  const printWin = window.open('', '_blank', 'width=850,height=900');
+  if (!printWin) {
+    alert('Please allow popups to export as PDF.');
+    return;
+  }
+  printWin.document.write(`<!DOCTYPE html><html><head><title>JUSTICE AI - Legal Consultation Dossier</title>
+    <style>body{font-family:Inter,Arial,sans-serif;padding:36px 44px;color:#111827;max-width:780px;margin:0 auto;}
+    @media print { body{padding: 20px;} }</style></head><body>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #111827;padding-bottom:12px;margin-bottom:20px;">
+      <div>
+        <div style="font-family:Impact,sans-serif;font-size:26px;letter-spacing:1px;">JUSTICE AI</div>
+        <div style="font-size:12px;color:#6B7280;">Universal Multi-Jurisdictional Legal Intelligence Dossier</div>
+      </div>
+      <div style="font-size:12px;color:#6B7280;text-align:right;">
+        <div>Date: ${new Date().toLocaleDateString()}</div>
+        <div>Jurisdiction: ${reg}</div>
+      </div>
+    </div>
+    ${turnsHtml}
+    <div style="margin-top:24px;padding:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;font-size:11px;color:#6B7280;">
+      General legal information grounded in official statutory codes, not formal legal advice. Consult a licensed legal practitioner in your jurisdiction.
+    </div>
+    <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 250); };<\/script>
+    </body></html>`);
+  printWin.document.close();
+}
+
+async function copyShareLink() {
+  if (!chatMessages.length) {
+    closeAllPopoversExcept(null);
+    alert('Start a conversation first to generate a share link.');
+    return;
+  }
+  const btn = document.getElementById('btnCopyShareLink');
+  const reg = document.getElementById('selRegion') ? document.getElementById('selRegion').value : 'AUTO';
+  const cat = document.getElementById('selCategory') ? document.getElementById('selCategory').value : currentCategory;
+  const firstUser = chatMessages.find(m => m.role === 'user');
+  const title = firstUser ? firstUser.content.slice(0, 50) : 'Shared Legal Consultation';
+
+  // Compact messages for sharing (strip massive base64 payloads so links stay fast)
+  const shareMsgs = chatMessages.filter(m => !m.loading).map(m => ({
+    ...m,
+    attachments: (m.attachments || []).map(a => ({ name: a.name, size: a.size, type: a.type, isImage: a.isImage, isPdf: a.isPdf }))
+  }));
+
+  let shareUrl = '';
+  try {
+    const res = await fetch('/api/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, jurisdiction: reg, category: cat, language: currentLang, messages: shareMsgs })
+    });
+    const data = await res.json();
+    if (data.status === 'success' && data.share_id) {
+      shareUrl = `${window.location.origin}/?share=${encodeURIComponent(data.share_id)}`;
+    }
+  } catch (_) {}
+
+  // Self-contained URL fallback if offline
+  if (!shareUrl) {
+    try {
+      const payload = { title, jurisdiction: reg, category: cat, language: currentLang, messages: shareMsgs };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      shareUrl = `${window.location.origin}/?shareData=${encodeURIComponent(encoded)}`;
+    } catch (e) {
+      console.error('Could not encode share link', e);
+    }
+  }
+
+  if (shareUrl) {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+    } catch (_) {
+      const tmp = document.createElement('input');
+      tmp.value = shareUrl;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      document.body.removeChild(tmp);
+    }
+    if (btn) {
+      const sp = btn.querySelector('span');
+      const orig = sp.textContent;
+      sp.textContent = 'Link Copied!';
+      setTimeout(() => {
+        sp.textContent = orig;
+        closeAllPopoversExcept(null);
+      }, 1100);
+    }
+    showToast('Share link copied to clipboard! Opening this URL restores this exact conversation.');
+  }
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toastBanner');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+async function checkSharedChatInUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const shareId = params.get('share');
+  const shareData = params.get('shareData');
+  let shared = null;
+
+  if (shareId) {
+    try {
+      const res = await fetch(`/api/share?id=${encodeURIComponent(shareId)}`);
+      const json = await res.json();
+      if (json.status === 'success' && json.data) {
+        shared = json.data;
+      }
+    } catch (e) {
+      console.error('Failed to load shared chat:', e);
+    }
+  } else if (shareData) {
+    try {
+      shared = JSON.parse(decodeURIComponent(escape(atob(shareData))));
+    } catch (e) {
+      console.error('Failed to decode shared chat:', e);
+    }
+  }
+
+  if (shared && Array.isArray(shared.messages) && shared.messages.length > 0) {
+    if (shared.jurisdiction && document.getElementById('selRegion')) {
+      document.getElementById('selRegion').value = shared.jurisdiction;
+      populateLanguageDropdown(shared.jurisdiction);
+    }
+    if (shared.category && document.getElementById('selCategory')) {
+      document.getElementById('selCategory').value = shared.category;
+      currentCategory = shared.category;
+    }
+    if (shared.language && shared.language !== 'AUTO') {
+      currentLang = shared.language;
+      if (document.getElementById('selLanguage')) {
+        document.getElementById('selLanguage').value = shared.language;
+      }
+    }
+    syncCustomSelectLabels();
+    chatMessages = shared.messages;
+    currentConversationId = 'shared_' + (shareId || Date.now());
+    const existing = userConversations.find(c => c.id === currentConversationId);
+    if (!existing) {
+      userConversations.unshift({
+        id: currentConversationId,
+        title: shared.title || 'Shared Consultation',
+        jurisdiction: shared.jurisdiction || 'AUTO',
+        category: shared.category || 'General',
+        messages: [...chatMessages]
+      });
+    }
+    renderRecentConversations();
+    startConsultation();
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
   renderRandomScenarios();
   populateLanguageDropdown("AUTO");
-  verifyExistingSession();
+  syncCustomSelectLabels();
+
+  const params = new URLSearchParams(window.location.search);
+  const hasShared = params.has('share') || params.has('shareData');
+  await verifyExistingSession(hasShared);
+  if (hasShared) {
+    await checkSharedChatInUrl();
+  }
+
+  // Attach Drag-and-drop & Paste listeners to Composer Box
+  const box = document.getElementById('composerBox');
+  const inp = document.getElementById('chatInput');
+  if (box) {
+    box.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      box.classList.add('drag-over');
+    });
+    box.addEventListener('dragleave', () => {
+      box.classList.remove('drag-over');
+    });
+    box.addEventListener('drop', (e) => {
+      e.preventDefault();
+      box.classList.remove('drag-over');
+      if (e.dataTransfer && e.dataTransfer.files) {
+        processFiles(Array.from(e.dataTransfer.files));
+      }
+    });
+  }
+  if (inp) {
+    inp.addEventListener('paste', (e) => {
+      if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length) {
+        processFiles(Array.from(e.clipboardData.files));
+      }
+    });
+  }
 });
 </script>
 </body>

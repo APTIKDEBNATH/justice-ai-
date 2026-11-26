@@ -72,6 +72,13 @@ def init_db():
                 FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
             );
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS shared_chats (
+                id TEXT PRIMARY KEY,
+                payload_json TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
     conn.close()
     _seed_demo_user()
 
@@ -388,6 +395,33 @@ def delete_conversation(user_id: int, conversation_id: str) -> bool:
             cur = conn.cursor()
             cur.execute("DELETE FROM conversations WHERE id = ? AND user_id = ?;", (conversation_id, user_id))
             return cur.rowcount > 0
+    finally:
+        conn.close()
+
+def save_shared_chat(payload: Dict[str, Any]) -> str:
+    """Stores a shared conversation snapshot and returns its short share ID."""
+    share_id = uuid.uuid4().hex[:10]
+    conn = get_connection()
+    try:
+        with conn:
+            conn.execute(
+                "INSERT INTO shared_chats (id, payload_json) VALUES (?, ?);",
+                (share_id, json.dumps(payload, ensure_ascii=False))
+            )
+        return share_id
+    finally:
+        conn.close()
+
+def get_shared_chat(share_id: str) -> Optional[Dict[str, Any]]:
+    """Retrieves a shared conversation snapshot by its share ID."""
+    conn = get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT payload_json FROM shared_chats WHERE id = ?;", (share_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        return json.loads(row["payload_json"])
     finally:
         conn.close()
 
